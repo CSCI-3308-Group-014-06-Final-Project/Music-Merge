@@ -1,0 +1,14 @@
+Notes
+- You get 5 points for making meaningful consistent commits
+- Cory will only grade the main branch (you need to have 3 commits on the main per week)
+- He won’t grade project board (but be sure to close any open issues)
+- After updates, you should demo the code for Cory 
+
+Requirements
+1. You’ll be expected to have release notes generated before the meeting every week
+    - All you need to do is click “generate automatic release notes”
+2. We’ll use these notes as talking points
+3. You also need to have a plan for what you’ll do next week
+
+Summary
+We reviewed our Lab 9 submission with Cory
