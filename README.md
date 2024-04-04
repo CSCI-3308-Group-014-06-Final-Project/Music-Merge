@@ -41,7 +41,17 @@ Our strategy for increasing novelty is to allow the user the choice for how to g
 
 # How to run Tests
 
-In Progress
+First, clone the repository. Then, add a .env file with the following content:
+```
+# database credentials
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="pwd"
+POSTGRES_DB="users_db"
+
+# Node vars
+SESSION_SECRET="super duper secret!"
+API_KEY="hcaj7Z7rmERbfgzQrHCy3IPaXvElhVGs"
+```
 
 # Link to Application
 
