@@ -41,12 +41,29 @@ Our strategy for increasing novelty is to allow the user the choice for how to g
 
 # How to run Tests
 
-In Progress
+First, clone the repository. Then, add a .env file with the following content:
+```
+# database credentials
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="pwd"
+POSTGRES_DB="users_db"
+
+# Node vars
+SESSION_SECRET="super duper secret!"
+API_KEY="hcaj7Z7rmERbfgzQrHCy3IPaXvElhVGs"
+```
 
 # Link to Application
 
-<!-- Not sure if these sections are necesary if our app is a Web App
 # Prerequisites
+- npm
+- docker-compose
 
 # Installation Instructions
--->
+1. Download the latest release
+2. Navigate to the home directory of the repository
+2. Install npm dependencies with `npm install`
+3. Open up the terminal and navigate to the `ProjectSourceCode` folder
+4. Run `docker-compose up -d` in your terminal
+5. Visit `http:\\localhost:3000`
+6. Enjoy!

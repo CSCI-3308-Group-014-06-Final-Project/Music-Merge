@@ -65,6 +65,7 @@ const user = {
 	username: undefined
 };
 
+
 const auth = (req, res, next) => {
   if (!req.session.user) {
     // Default to login page.
@@ -72,7 +73,6 @@ const auth = (req, res, next) => {
   }
   next();
 };
-
 
 app.get('/', (req, res) => {
 	res.render('pages/home')
@@ -105,7 +105,6 @@ app.get('/register', (req, res) => {
 });
 
 
-
 //logout page
 app.get('/logout', auth, (req, res) => {
     // Destroy the session and logout the user
@@ -117,10 +116,40 @@ app.get('/logout', auth, (req, res) => {
       res.render('pages/logout', { message: 'Logged out Successfully' });
     });
   });
+
+// Make sure to apply the auth middleware to the /discover route
+app.get('/discover', (req, res) => {
+	axios({
+	  url: `https://app.ticketmaster.com/discovery/v2/events.json`,
+	  method: 'GET',
+	  dataType: 'json',
+	  headers: {
+		'Accept-Encoding': 'application/json',
+	  },
+	  params: {
+		apikey: process.env.API_KEY,
+		keyword: 'noah', // You can choose any artist/event here.
+		size: 10
+	  },
+	})
+	.then(results => {
+	  console.log(results.data);
+	  res.render('pages/discover', {events: results.data._embedded.events});
+	})
+	.catch(error => {
+	  res.render('pages/discover', {message: error});
+	  // Handle error (e.g., render an error page).
+	});
+  });
   
+app.get('/welcome', (req, res) => {
+	res.json({status: 'success', message: 'Welcome!'});
+  });
+
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
