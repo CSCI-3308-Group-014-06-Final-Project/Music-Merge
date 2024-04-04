@@ -13,6 +13,17 @@ const session = require('express-session'); // To set the session object. To sto
 const bcrypt = require('bcrypt'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 
+const hbs = handlebars.create({
+	extname: 'hbs',
+	layoutsDir: __dirname + '/views/layouts',
+	partialsDir: __dirname + '/views/partials',
+  });
+
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
 // *****************************************************
