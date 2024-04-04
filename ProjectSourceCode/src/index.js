@@ -27,7 +27,24 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
 // *****************************************************
-
+const dbConfig = {
+	host: 'db',
+	port: 5432,
+	database: process.env.POSTGRES_DB,
+	user: process.env.POSTGRES_USER,
+	password: process.env.POSTGRES_PASSWORD,
+};
+const db = pgp(dbConfig);  
+  // db test
+db.connect()
+	.then(obj => {
+	  // Can check the server version here (pg-promise v10.1.0+):
+	console.log('Database connection successful');
+	  obj.done(); // success, release the connection;
+	})
+	.catch(error => {
+	console.log('ERROR', error.message || error);
+	});
 // *****************************************************
 // <!-- Section 3 : App Settings -->
 // *****************************************************
@@ -35,9 +52,30 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
+app.get('/', (req, res) => {
+	res.render('pages/home')
+});
 
-app.get('/login', (req, res) => {
+app.get('/login', (req, res) => { //Login attempt
 	res.render('pages/login');
+});
+
+app.post('/login', (req, res) => {
+	const username = req.body.username;
+	const password = req.body.password;
+	const query = 'select * from users where users.username = $1 LIMIT 1'; //Not sure about this
+	const values = [username];
+	console.log(req);
+
+	db.one(query, values)
+		.then(data => {
+			//Update session data with users info (not in db yet)
+			res.redirect('/'); //Redirect home with updated session
+		})
+		.catch(err => {
+			console.log(err);
+			res.redirect('/login');
+		});
 });
 
 app.get('/register', (req, res) => {
