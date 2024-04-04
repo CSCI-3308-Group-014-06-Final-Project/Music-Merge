@@ -88,6 +88,32 @@ app.get('/register', (req, res) => {
 	res.render('pages/register');
 });
 
+// Make sure to apply the auth middleware to the /discover route
+app.get('/discover', (req, res) => {
+	axios({
+	  url: `https://app.ticketmaster.com/discovery/v2/events.json`,
+	  method: 'GET',
+	  dataType: 'json',
+	  headers: {
+		'Accept-Encoding': 'application/json',
+	  },
+	  params: {
+		apikey: process.env.API_KEY,
+		keyword: 'noah', // You can choose any artist/event here.
+		size: 10
+	  },
+	})
+	.then(results => {
+	  console.log(results.data);
+	  res.render('pages/discover', {events: results.data._embedded.events});
+	})
+	.catch(error => {
+	  res.render('pages/discover', {message: error});
+	  // Handle error (e.g., render an error page).
+	});
+  });
+  
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
