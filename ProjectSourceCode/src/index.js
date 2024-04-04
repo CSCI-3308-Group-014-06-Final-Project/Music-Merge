@@ -27,7 +27,25 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
 // *****************************************************
-
+const dbConfig = {
+	host: 'db',
+	port: 5432,
+	database: process.env.POSTGRES_DB,
+	user: process.env.POSTGRES_USER,
+	password: process.env.POSTGRES_PASSWORD,
+  };
+  const db = pgp(dbConfig);
+  
+  // db test
+  db.connect()
+	.then(obj => {
+	  // Can check the server version here (pg-promise v10.1.0+):
+	  console.log('Database connection successful');
+	  obj.done(); // success, release the connection;
+	})
+	.catch(error => {
+	  console.log('ERROR', error.message || error);
+	});
 // *****************************************************
 // <!-- Section 3 : App Settings -->
 // *****************************************************
@@ -35,6 +53,11 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
+const user = {
+	password: undefined,
+	username: undefined
+};
+
 app.get('/', (req, res) => {
 	res.render('pages/home')
 });
