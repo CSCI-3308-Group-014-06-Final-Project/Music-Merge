@@ -45,8 +45,15 @@ In Progress
 
 # Link to Application
 
-<!-- Not sure if these sections are necesary if our app is a Web App
 # Prerequisites
+- npm
+- docker-compose
 
 # Installation Instructions
--->
+1. Download the latest release
+2. Navigate to the home directory of the repository
+2. Install npm dependencies with `npm install`
+3. Open up the terminal and navigate to the `ProjectSourceCode` folder
+4. Run `docker-compose up -d` in your terminal
+5. Visit `http:\\localhost:3000`
+6. Enjoy!
