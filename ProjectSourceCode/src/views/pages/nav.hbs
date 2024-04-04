@@ -1,0 +1,18 @@
+ <nav class="navbar">
+    <div class="logo">Music Merge</div>
+    {{#if loggedIn}}
+      <ul class="nav-links">
+        <li><a href="../pages/login.hbs">Logout</a></li>
+      </ul>
+    {{else}}
+      {{#if onLoginPage}}
+        <ul class="nav-links">
+          <li><a href="../pages/register.hbs">Register</a></li>
+        </ul>
+      {{else}}
+        <ul class="nav-links">
+          <li><a href="../pages/login.hbs">Login</a></li>
+        </ul>
+      {{/if}}
+    {{/if}}
+  </nav>
