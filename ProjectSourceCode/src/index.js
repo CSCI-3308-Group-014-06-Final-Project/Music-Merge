@@ -50,12 +50,28 @@ const dbConfig = {
 // <!-- Section 3 : App Settings -->
 // *****************************************************
 
+app.use(
+	session({
+	  secret: process.env.SESSION_SECRET,
+	  saveUninitialized: false,
+	  resave: false,
+	})
+  );
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 const user = {
 	password: undefined,
 	username: undefined
+};
+
+
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
 };
 
 app.get('/', (req, res) => {
@@ -88,6 +104,19 @@ app.get('/register', (req, res) => {
 	res.render('pages/register');
 });
 
+
+//logout page
+app.get('/logout', auth, (req, res) => {
+    // Destroy the session and logout the user
+    req.session.destroy(err => {
+      if(err) {
+        console.error('Error destroying session:', err);
+      }
+      // Render the logout page with a success message
+      res.render('pages/logout', { message: 'Logged out Successfully' });
+    });
+  });
+
 // Make sure to apply the auth middleware to the /discover route
 app.get('/discover', (req, res) => {
 	axios({
@@ -113,10 +142,14 @@ app.get('/discover', (req, res) => {
 	});
   });
   
+app.get('/welcome', (req, res) => {
+	res.json({status: 'success', message: 'Welcome!'});
+  });
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');

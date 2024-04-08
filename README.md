@@ -46,7 +46,7 @@ First, clone the repository. Then, add a .env file with the following content:
 # database credentials
 POSTGRES_USER="postgres"
 POSTGRES_PASSWORD="pwd"
-POSTGRES_DB="users_db"
+POSTGRES_DB="users"
 
 # Node vars
 SESSION_SECRET="super duper secret!"
