@@ -24,6 +24,18 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
+app.use(
+	session({
+	  secret: process.env.SESSION_SECRET,
+	  saveUninitialized: true,
+	  resave: true,
+	})
+  );
+  app.use(
+	bodyParser.urlencoded({
+	  extended: true,
+	})
+  );
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
 // *****************************************************
@@ -46,8 +58,8 @@ app.get('/login', (req, res) => { //Login attempt
 app.post('/login', (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
-	const query = 'select * from users where users.username = $1 LIMIT 1'; //Not sure about this
-	const values = [username];
+	const query = 'select * from users where users.username = $1 AND users.password = $2 LIMIT 1'; //Not sure about this
+	const values = [username, password];
 	console.log(req);
 
 	db.one(query, values)
