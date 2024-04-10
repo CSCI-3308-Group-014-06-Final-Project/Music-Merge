@@ -146,6 +146,37 @@ app.get('/welcome', (req, res) => {
 	res.json({status: 'success', message: 'Welcome!'});
   });
 
+//SPOTIFY EXAMPLE
+
+// Authorization token that must have been created previously. See : https://developer.spotify.com/documentation/web-api/concepts/authorization
+const token = 'BQAglxA4MOHg0EkibANrmiz3U0lrx0UmnJtgHHM-i_XkdaW4xOnv2R1zsCy3-Jyi32ijbJjg-4dQawjAIBZSrnEY9MgAXCS8epAQh273rR7Cw9iX7k0aoR1kZmboN7_i-tXhj7UCiDII_tAGjYA76C5hoP64zEJNmBT9nrTr7oW7P0ruv26i1NHFvh3EmuZOtAnuk5tZWzyj1kdBm72CGYgexfVmIRBxE9KZj9jD0GFmrfnczyHHZy8QmdHnHDCvY7t_';
+async function fetchWebApi(endpoint, method, body) {
+  const res = await fetch(`https://api.spotify.com/${endpoint}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    method,
+    body:JSON.stringify(body)
+  });
+  return await res.json();
+}
+
+async function getTopTracks(){
+  // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
+  return (await fetchWebApi(
+    'v1/me/top/tracks?time_range=long_term&limit=5', 'GET'
+  )).items;
+}
+
+const topTracks = await getTopTracks();
+console.log(
+  topTracks?.map(
+    ({name, artists}) =>
+      `${name} by ${artists.map(artist => artist.name).join(', ')}`
+  )
+);
+
+//SPOTIFY EXAMPLE
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
