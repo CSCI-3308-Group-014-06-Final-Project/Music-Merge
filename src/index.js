@@ -69,6 +69,105 @@ app.use(
 	  resave: false,
 	})
   );
+
+// *****************************************************
+// <!-- Section 3 : Connect to Spotify API -->
+// *****************************************************
+app.get('/register', (req, res) => {
+	res.render('pages/register');
+});
+
+app.post('/register', async (req, res) => { // Mark this function as async
+	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
+	res.redirect(result); // Use the result for redirection or response
+	const accessToken = await getAccessToken(clientId, code);
+	const profile = await fetchProfile(accessToken);
+	console.log(profile);
+});
+
+
+const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
+const url = require('url');
+let globalUrl;
+const crypto = require('crypto');
+const params = new URLSearchParams(globalUrl);
+console.log("global" + globalUrl)
+const code = params.get("code");
+async function handleAuthFlow() {
+	if (!code) {
+		return await redirectToAuthCodeFlow(clientId);
+	} else {
+		const accessToken = await getAccessToken(clientId, code);
+		return await fetchProfile(accessToken);
+	}
+}
+
+const storage = {};
+
+async function redirectToAuthCodeFlow(clientId) {
+	const verifier = generateCodeVerifier(128);
+	const challenge = await generateCodeChallenge(verifier);
+	storage.verifier = verifier;
+
+	const params = new URLSearchParams();
+	params.append("client_id", clientId);
+	params.append("response_type", "code");
+	params.append("redirect_uri", "http://localhost:3000/login");
+	params.append("scope", "user-read-private user-read-email");
+	params.append("code_challenge_method", "S256");
+	params.append("code_challenge", challenge);
+
+	const redirectUrl = `https://accounts.spotify.com/authorize?${params.toString()}`;
+	return await redirectUrl;
+}
+
+function generateCodeVerifier(length) {
+	let text = '';
+	let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	for (let i = 0; i < length; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	return text;
+}
+
+async function generateCodeChallenge(codeVerifier) {
+	const data = Buffer.from(codeVerifier);
+	const digest = await crypto.subtle.digest('SHA-256', data);
+	return Buffer.from(digest)
+		.toString('base64')
+		.replace(/\+/g, '-')
+		.replace(/\//g, '_')
+		.replace(/=+$/, '');
+}
+
+async function getAccessToken(clientId, code) {
+	const verifier = storage.verifier;
+
+	const params = new URLSearchParams();
+	params.append("client_id", clientId);
+	params.append("grant_type", "authorization_code");
+	params.append("code", code);
+	params.append("redirect_uri", "http://localhost:3000/login");
+	params.append("code_verifier", verifier);
+
+	const result = await fetch("https://accounts.spotify.com/api/token", {
+		method: "POST",
+		headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		body: params
+	});
+	console.log(params)
+
+	const { access_token } = await result.json();
+	return access_token;
+}
+
+async function fetchProfile(token) {
+	const result = await fetch("https://api.spotify.com/v1/me", {
+		method: "GET", headers: { Authorization: `Bearer ${token}` }
+	});
+	return await result.json();
+}
+
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
@@ -91,6 +190,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => { //Login attempt
+	globalUrl = req.query.code;
 	res.render('pages/login');
 });
 
@@ -110,10 +210,6 @@ app.post('/login', (req, res) => {
 			console.log(err);
 			res.redirect('/login');
 		});
-});
-
-app.get('/register', (req, res) => {
-	res.render('pages/register');
 });
 
 
