@@ -77,13 +77,13 @@ app.get('/register', (req, res) => {
 	res.render('pages/register');
 });
 
-app.post('/register', async (req, res) => { // Mark this function as async
-	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
-	res.redirect(result); // Use the result for redirection or response
-	const accessToken = await getAccessToken(clientId, code);
-	const profile = await fetchProfile(accessToken);
-	console.log(profile);
-});
+// app.post('/register', async (req, res) => { // Mark this function as async
+// 	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
+// 	res.redirect(result); // Use the result for redirection or response
+// 	const accessToken = await getAccessToken(clientId, code);
+// 	const profile = await fetchProfile(accessToken);
+// 	console.log(profile);
+// });
 
 //Register - need to fix to connect and work on hash
 app.post('/register', (req, res) => {
@@ -92,12 +92,12 @@ app.post('/register', (req, res) => {
 	//const hash = await bcrypt.hash(req.body.password, 10);
 	// To-DO: Insert username and hashed password into the 'users' table
 
-	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
 	// db.any(query, [req.body.username, hash])
 	if(req.body.username == "" || req.body.password == ""){
 		throw new Error('Cannot be empty! Please input a username and password.');
 	}
-	
+
+	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
 	db.any(query, [req.body.username, req.body.password])
 	.then(function(data){
 	  console.log(data)
