@@ -116,6 +116,28 @@ app.get('/register', (req, res) => {
 	res.render('pages/register');
 });
 
+//Register
+app.post('/register', (req, res) => {
+	// need to fix hashing, gotta put async in the app line when we do
+	//hash the password using bcrypt library
+	//const hash = await bcrypt.hash(req.body.password, 10);
+	// To-DO: Insert username and hashed password into the 'users' table
+  
+	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
+	// db.any(query, [req.body.username, hash])
+	db.any(query, [req.body.username, req.body.password])
+	.then(function(data){
+	  console.log(data)
+	  // do we want a successful registration to redirect to the login page?
+	  res.redirect("/login")
+	})
+
+	// need to change so that an error redirects to the login page, since thats how we wrote the test
+	.catch(function(error){
+	  res.redirect("/register")
+	})
+  
+  });
 
 //logout page
 app.get('/logout', auth, (req, res) => {
