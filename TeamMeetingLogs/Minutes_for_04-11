@@ -1,0 +1,17 @@
+What everyone did:
+Kelly - worked on register back end
+Danny - worked on reroutes, fetching playlists that belong to the user, creating playlists and being able to add playlist, search query
+Toby - login fixing and worked on creating a settings page
+Eli - worked on the lab, work on front end and homepage and UI
+Noah - API connection, able to register and connect to spotify account, and redirects to login
+Aayush - worked on the Navbar, need to work on middleware for changing from login register logout and homepage
+
+Need to create a tag for week 11
+
+What everyone will do:
+Kelly - will work on spotify connect page, front end login and homepage
+Danny - fix merge conflicts, and get api routes to work
+Toby - settings page
+Eli - work on front end and homepage and UI
+Noah - API connection front end working, discover page integrate with API
+Aayush - need to work on middleware for changing from login register logout and homepage
