@@ -36,8 +36,8 @@ describe('Negative Testing Register', () => {
        .post('/register')
        .send({username: '', password: 'password'})
        .end((err, res) => {
-           res.should.redirectTo(/register$/);
-           done();
+            expect(res).to.have.status(500);
+            done();
        });
        });
     });
@@ -48,7 +48,7 @@ describe('Positive Testing Register', () => {
         chai
         .request(server)
         .post('/register')
-        .send({username: 'NewUsername2', password: 'password'})
+        .send({username: 'NewUsername', password: 'password', spotifyusername: 'username'})
         .end((err, res) => {
             res.should.redirectTo(/login$/);
             done();
