@@ -48,7 +48,7 @@ describe('Positive Testing Register', () => {
         chai
         .request(server)
         .post('/register')
-        .send({username: 'NewUsername', password: 'password', spotifyusername: 'username'})
+        .send({username: 'canthavethesameusernametotest', password: 'password', spotifyusername: 'username'})
         .end((err, res) => {
             res.should.redirectTo(/login$/);
             done();
