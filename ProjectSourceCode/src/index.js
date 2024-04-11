@@ -146,6 +146,7 @@ app.get('/welcome', (req, res) => {
 	res.json({status: 'success', message: 'Welcome!'});
   });
 
+/*
 //SPOTIFY EXAMPLE
 
 // Authorization token that must have been created previously. See : https://developer.spotify.com/documentation/web-api/concepts/authorization
@@ -177,6 +178,27 @@ console.log(
 );
 
 //SPOTIFY EXAMPLE
+*/
+
+app.get('/test', async (req, res) => {
+	const response =
+		await axios({
+			url: ,
+			method: ,
+			dataType: ,
+			headers: {},
+			params: {
+				apikey: process.env.API_KEY,
+			},
+		})
+		  .then(results => {
+		})
+		  .catch(error => {
+			  results: [];
+			  res.render('pages/test', {message: "No playlists"});
+		});
+});
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
