@@ -102,7 +102,7 @@ app.post('/register', (req, res) => {
 
   });
 
-const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
+//const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
 const url = require('url');
 let globalUrl;
