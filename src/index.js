@@ -64,7 +64,46 @@ const dbConfig = {
 // <!-- Section 3 : Connect to Spotify API -->
 // *****************************************************
 
+
 const clientId = process.env.API_KEY;
+
+// app.post('/register', async (req, res) => { // Mark this function as async
+// 	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
+// 	res.redirect(result); // Use the result for redirection or response
+// 	const accessToken = await getAccessToken(clientId, code);
+// 	const profile = await fetchProfile(accessToken);
+// 	console.log(profile);
+// });
+
+//Register - need to fix to connect and work on hash
+app.post('/register', (req, res) => {
+	// need to fix hashing, gotta put async in the app line when we do
+	//hash the password using bcrypt library
+	//const hash = await bcrypt.hash(req.body.password, 10);
+	// To-DO: Insert username and hashed password into the 'users' table
+
+	// db.any(query, [req.body.username, hash])
+	if(req.body.username == "" || req.body.password == ""){
+		throw new Error('Cannot be empty! Please input a username and password.');
+	}
+
+	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
+	db.any(query, [req.body.username, req.body.password])
+	.then(function(data){
+	  console.log(data)
+	  // do we want a successful registration to redirect to the login page?
+	  res.redirect("/login")
+	})
+
+	// need to change so that an error redirects to the login page, since thats how we wrote the test
+	.catch(function(error){
+	  res.redirect("/register")
+	})
+
+  });
+
+const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
+
 const url = require('url');
 let globalUrl;
 const crypto = require('crypto');
