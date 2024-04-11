@@ -94,6 +94,10 @@ app.post('/register', (req, res) => {
 
 	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
 	// db.any(query, [req.body.username, hash])
+	if(req.body.username == "" || req.body.password == ""){
+		throw new Error('Cannot be empty! Please input a username and password.');
+	}
+	
 	db.any(query, [req.body.username, req.body.password])
 	.then(function(data){
 	  console.log(data)
