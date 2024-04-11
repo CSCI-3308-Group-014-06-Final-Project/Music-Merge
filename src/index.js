@@ -231,7 +231,17 @@ app.get('/logout', auth, (req, res) => {
     });
 });
 
+//Settings Page
+app.get('/settings', (req, res) => {
+	res.render('pages/settings');
+})
 
+app.post('/settings', (req, res) => {
+	settings.option1 = req.body.option1;
+	settings.option2 = req.body.option2;
+	settings.option3 = req.body.option3;
+	settings.option4 = req.body.option4;
+})
 // Make sure to apply the auth middleware to the /discover route
 app.get('/discover', (req, res) => {
 	axios({
