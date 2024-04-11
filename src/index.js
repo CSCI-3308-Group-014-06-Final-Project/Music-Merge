@@ -171,6 +171,13 @@ async function fetchProfile(token) {
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
+const settings = {
+	option1: undefined,
+	option2: undefined,
+	option3: undefined,
+	option4: undefined,
+};
+
 const user = {
 	password: undefined,
 	username: undefined
@@ -212,18 +219,18 @@ app.post('/login', (req, res) => {
 		});
 });
 
-
 //logout page
 app.get('/logout', auth, (req, res) => {
-    // Destroy the session and logout the user
+	// Destroy the session and logout the user
     req.session.destroy(err => {
-      if(err) {
-        console.error('Error destroying session:', err);
-      }
-      // Render the logout page with a success message
-      res.render('pages/logout', { message: 'Logged out Successfully' });
+		if(err) {
+			console.error('Error destroying session:', err);
+		}
+		// Render the logout page with a success message
+		res.render('pages/logout', { message: 'Logged out Successfully' });
     });
-  });
+});
+
 
 // Make sure to apply the auth middleware to the /discover route
 app.get('/discover', (req, res) => {
