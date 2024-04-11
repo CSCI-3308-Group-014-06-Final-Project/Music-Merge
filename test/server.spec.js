@@ -1,6 +1,6 @@
 // ********************** Initialize server **********************************
 
-const server = require('../index'); //TODO: Make sure the path to your index.js is correctly added
+const server = require('../src/index'); //TODO: Make sure the path to your index.js is correctly added
 
 // ********************** Import Libraries ***********************************
 
@@ -28,5 +28,59 @@ describe('Server!', () => {
 });
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
+
+describe('Negative Testing Register', () => {
+    it('negative : /register', done => {
+       chai
+       .request(server)
+       .post('/register')
+       .send({username: '', password: 'password'})
+       .end((err, res) => {
+           res.should.redirectTo(/register$/);
+           done();
+       });
+       });
+    });
+    
+
+describe('Positive Testing Register', () => {
+    it('positive : /register', done => {
+        chai
+        .request(server)
+        .post('/register')
+        .send({username: 'NewUsername2', password: 'password'})
+        .end((err, res) => {
+            res.should.redirectTo(/login$/);
+            done();
+         });
+    });
+});
+
+describe('Testing Login API', () => {
+    it('positive : /login redirects to discover page on successful login', done => {
+        chai
+            .request(server)
+            .post('/login')
+            .send({username: 'ValidUser', password: 'CorrectPassword'})
+            .end((err, res) => {
+                res.should.redirectTo(/discover$/); 
+                done();
+            });
+    });
+});
+
+describe('Testing Login API', () => {
+    it('negative : /login', done => {
+       chai
+       .request(server)
+       .post('/login')
+       .send({username: 'James', password: 'thisisafakepassword'})
+       .end((err, res) => {
+           res.should.redirectTo(/login$/);
+           done();
+       });
+    });
+});
+    
 
 // ********************************************************************************
