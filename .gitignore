@@ -1,9 +1,6 @@
-src/node_modules
-src/package-lock.json
+node_modules
 .env
 # Ignore vim files:
 *~
 *.swp
 *.swo
-
-

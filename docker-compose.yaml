@@ -20,7 +20,7 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - ./src:/home/node/app
+      - ./:/repository
     command: 'npm run testandrun'
 volumes:
   group-project:
