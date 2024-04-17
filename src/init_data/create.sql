@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS playlists (
 	id INT PRIMARY KEY NOT NULL,
-	username VARCHAR(50) FOREIGN KEY REFERENCES users(username)
+	username VARCHAR(50), 
+	FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
 	---> will probably need to link to the playlist using spotify api. not sure what that will look like.
 );
