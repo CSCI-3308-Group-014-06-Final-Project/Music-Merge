@@ -13,6 +13,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcrypt'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const url = require('url');
+const crypto = require('crypto');
 
 const hbs = handlebars.create({
 	extname: 'hbs',
@@ -104,9 +106,7 @@ app.post('/register', (req, res) => {
 
 //const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
-const url = require('url');
 let globalUrl;
-const crypto = require('crypto');
 const params = new URLSearchParams(globalUrl);
 console.log("global" + globalUrl)
 const code = params.get("code");
