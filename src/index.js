@@ -13,6 +13,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcrypt'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const url = require('url');
+const crypto = require('crypto');
 let loggedIn = false;
 
 const hbs = handlebars.create({
@@ -67,7 +69,6 @@ db.connect()
 
 
 const clientId = process.env.API_KEY;
-//const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
 //Register - need to fix to connect and work on hash
 app.post('/register', async (req, res) => {
@@ -97,11 +98,7 @@ app.post('/register', async (req, res) => {
 
 });
 
-//const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
-
-const url = require('url');
 let globalUrl;
-const crypto = require('crypto');
 let profile;
 let accessToken;
 const params = new URLSearchParams(globalUrl);
@@ -249,14 +246,6 @@ app.get('/register', (req, res) => {
 	res.render('pages/register');
 });
 
-// app.post('/register', async (req, res) => { // Mark this function as async
-// 	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
-// 	res.redirect(result); // Use the result for redirection or response
-// 	const accessToken = await getAccessToken(clientId, code);
-// 	const profile = await fetchProfile(accessToken);
-// 	console.log(profile);
-// });
-
 app.get('/login', async (req, res) => { //Login attempt
 	const code = req.query.code; // This captures the code from the URL
 	accessToken = await getAccessToken(clientId, code);
@@ -345,87 +334,6 @@ app.get('/welcome', (req, res) => {
 	res.json({ status: 'success', message: 'Welcome!' });
 });
 
-
-/*
-//SPOTIFY EXAMPLE
-
-// Authorization token that must have been created previously. See : https://developer.spotify.com/documentation/web-api/concepts/authorization
-const token = 'BQAglxA4MOHg0EkibANrmiz3U0lrx0UmnJtgHHM-i_XkdaW4xOnv2R1zsCy3-Jyi32ijbJjg-4dQawjAIBZSrnEY9MgAXCS8epAQh273rR7Cw9iX7k0aoR1kZmboN7_i-tXhj7UCiDII_tAGjYA76C5hoP64zEJNmBT9nrTr7oW7P0ruv26i1NHFvh3EmuZOtAnuk5tZWzyj1kdBm72CGYgexfVmIRBxE9KZj9jD0GFmrfnczyHHZy8QmdHnHDCvY7t_';
-async function fetchWebApi(endpoint, method, body) {
-  const res = await fetch(`https://api.spotify.com/${endpoint}`, {
-	headers: {
-	  Authorization: `Bearer ${token}`,
-	},
-	method,
-	body:JSON.stringify(body)
-  });
-  return await res.json();
-}
-
-async function getTopTracks(){
-  // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
-  return (await fetchWebApi(
-	'v1/me/top/tracks?time_range=long_term&limit=5', 'GET'
-  )).items;
-}
-
-const topTracks = await getTopTracks();
-console.log(
-  topTracks?.map(
-	({name, artists}) =>
-	  `${name} by ${artists.map(artist => artist.name).join(', ')}`
-  )
-);
-
-//SPOTIFY EXAMPLE
-
-
-app.get('/test', async (req, res) => {
-	const response =
-		await axios({
-			url: ,
-			method: ,
-			dataType: ,
-			headers: {},
-			params: {
-				apikey: process.env.API_KEY,
-			},
-		})
-		  .then(results => {
-		})
-		  .catch(error => {
-			  results: [];
-			  res.render('pages/test', {message: "No playlists"});
-		});
-});
-*/
-
-// fetch self playlists, route names not final
-// in progress (need to figure out of to get key to load on new instances
-app.get('/test', async (req, res) => {
-	//console.log(getAccessToken(clientId,code));
-	const response =
-		await axios({
-			url: `https://api.spotify.com/v1/me/playlists`,
-			method: `GET`,
-			dataType: `json`,
-			headers: {
-				//`Accept-Encoding`: `application/json`,
-				Authorization: `bearer ${getAccessToken(clientId, req.query.code)}`
-			},
-			params: {
-				limit: 20,
-				offset: 0,
-			},
-		})
-			.then(results => {
-				console.log(results);
-				return results.items;
-			}).catch(error => {
-				results: [];
-				res.render('pages/test', { message: "Error loading Laufey events please try again" });
-			});
-});
 
 //create playlist and add in tracks
 //in progress
@@ -544,46 +452,11 @@ async function getTrackInfo(access_token) {
 
 //test search with no user context
 app.get('/search', async (req, res) => {
-	//const accessString = `bearer ${getToken}`;
-	/*
-	const response = 
-		await axios ({
-			url: `https://api.spotify.com/v1/search`,
-			method: `GET`,
-			dataType: `json`,
-			headers: {
-				Authorization: accessString
-			},
-			params: {
-				q: 'remaster%20track:Doxy%20artist:Miles%20Davis',
-				type: `artist`
-			},
-		}).then(results => {
-			console.log(results);
-		}).catch(error => {
-			console.log(error);
-		});
-	*/
 	const Token = await getToken().then(response => {
 		getTrackInfo(response.access_token).then(profile => {
 			console.log(profile);
 		})
 	});
-	/*
-	const response = await axios.get('https://api.spotify.com/v1/search/', {
-	  params: {
-		'q': 'remaster%20track:Doxy%20artist:Miles%20Davis',
-		'type': 'album'
-	  },
-	  headers: {
-		'Authorization': `Bearer ${Token}`
-	  }
-	}).catch(error => {
-		res.render('pages/test', {message: "uh-oh"});
-		console.log(error);
-	});
-	console.log(response);
-	*/
 });
 
 // *****************************************************
