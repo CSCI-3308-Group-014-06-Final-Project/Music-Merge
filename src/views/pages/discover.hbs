@@ -1,69 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Playlist Selection</title>
-  <style>
-    footer {
-      height: 50px;
-      /* Adjust the value as needed */
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f4;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-
-    td,
-    th {
-      text-align: left;
-      padding: 8px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    img {
-      border-radius: 5px;
-    }
-
-    .playlist-checkbox {
-      transform: scale(1.5);
-      margin-right: 10px;
-    }
-
-    .btn-primary {
-      background-color: #007bff;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
-
-    .submit-btn-container {
-      text-align: center;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-
 <body>
 
   <h1>Playlists Page</h1>
@@ -108,48 +45,46 @@
     <div class="submit-btn-container">
       <button type="submit" class="btn-primary">Merge Playlists</button>
     </div>
-    <div id="mergeMessage" style="text-align:center; color: green; margin-top: 20px;"></div> <!-- Message placeholder -->
+    <div id="mergeMessage" style="text-align:center; color: green; margin-top: 20px;"></div>
   </form>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('playlistsForm');
-  const checkboxes = document.querySelectorAll('.playlist-checkbox');
-  const messageDiv = document.getElementById('mergeMessage'); // Get the message div
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('playlistsForm');
+      const checkboxes = document.querySelectorAll('.playlist-checkbox');
+      const messageDiv = document.getElementById('mergeMessage');
 
-  function updateCheckboxState() {
-    const checkedCount = document.querySelectorAll('.playlist-checkbox:checked').length;
-    checkboxes.forEach(checkbox => {
-      if (checkedCount >= 2) {
-        checkbox.disabled = checkbox.checked ? false : true;
-      } else {
-        checkbox.disabled = false;
+      function updateCheckboxState() {
+        const checkedCount = document.querySelectorAll('.playlist-checkbox:checked').length;
+        checkboxes.forEach(checkbox => {
+          if (checkedCount >= 2) {
+            checkbox.disabled = checkbox.checked ? false : true;
+          } else {
+            checkbox.disabled = false;
+          }
+        });
       }
-    });
-  }
 
-  checkboxes.forEach(checkbox => 
-    checkbox.addEventListener('change', updateCheckboxState)
-  );
+      checkboxes.forEach(checkbox =>
+        checkbox.addEventListener('change', updateCheckboxState)
+      );
 
-  form.addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from submitting in the traditional way
-    const selectedPlaylistURIs = [];
-    document.querySelectorAll('.playlist-checkbox:checked').forEach(checkbox => {
-      const playlistURI = checkbox.getAttribute('data-uri');
-      selectedPlaylistURIs.push(playlistURI);
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const selectedPlaylistURIs = [];
+        document.querySelectorAll('.playlist-checkbox:checked').forEach(checkbox => {
+          const playlistURI = checkbox.getAttribute('data-uri');
+          selectedPlaylistURIs.push(playlistURI);
+        });
+        console.log('Selected Playlist URIs:', selectedPlaylistURIs);
+        if (selectedPlaylistURIs.length > 0) {
+          messageDiv.textContent = 'Playlists successfully merged';
+        } else {
+          messageDiv.textContent = '';
+        }
+      });
     });
-    console.log('Selected Playlist URIs:', selectedPlaylistURIs);
-    
-    // Display the success message
-    if (selectedPlaylistURIs.length > 0) { // Check if at least one playlist is selected
-      messageDiv.textContent = 'Playlists successfully merged';
-    } else {
-      messageDiv.textContent = ''; // Clear message if no playlists are selected
-    }
-  });
-});
-</script>
+  </script>
 
 
 

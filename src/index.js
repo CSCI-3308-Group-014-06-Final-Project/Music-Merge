@@ -68,42 +68,34 @@ db.connect()
 //const clientId = process.env.API_KEY;
 const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
-app.post('/register', async (req, res) => { // Mark this function as async
+//Register - need to fix to connect and work on hash
+app.post('/register', async(req, res) => {
 	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
 	res.redirect(result); // Use the result for redirection or response
-});
+	// need to fix hashing, gotta put async in the app line when we do
+	//hash the password using bcrypt library
+	//const hash = await bcrypt.hash(req.body.password, 10);
+	// To-DO: Insert username and hashed password into the 'users' table
 
-//Register - need to fix to connect and work on hash
-// app.post('/register', async(req, res) => {
-// 	// const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
-// 	// res.redirect(result); // Use the result for redirection or response
-// 	// const accessToken = await getAccessToken(clientId, code);
-// 	// const profile = await fetchProfile(accessToken);
-// 	// console.log(profile);
-// 	// need to fix hashing, gotta put async in the app line when we do
-// 	//hash the password using bcrypt library
-// 	//const hash = await bcrypt.hash(req.body.password, 10);
-// 	// To-DO: Insert username and hashed password into the 'users' table
+	// db.any(query, [req.body.username, hash])
+	if(req.body.username == "" || req.body.password == ""){
+		throw new Error('Cannot be empty! Please input a username and password.');
+	}
 
-// 	// db.any(query, [req.body.username, hash])
-// 	if(req.body.username == "" || req.body.password == ""){
-// 		throw new Error('Cannot be empty! Please input a username and password.');
-// 	}
+	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
+	db.any(query, [req.body.username, req.body.password])
+	.then(function(data){
+	  console.log(data)
+	  // do we want a successful registration to redirect to the login page?
+	  //res.redirect("/login")
+	})
 
-// 	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
-// 	db.any(query, [req.body.username, req.body.password])
-// 	.then(function(data){
-// 	  console.log(data)
-// 	  // do we want a successful registration to redirect to the login page?
-// 	  res.redirect("/login")
-// 	})
+	// need to change so that an error redirects to the login page, since thats how we wrote the test
+	.catch(function(error){
+	  //res.redirect("/register")
+	})
 
-// 	// need to change so that an error redirects to the login page, since thats how we wrote the test
-// 	.catch(function(error){
-// 	  res.redirect("/register")
-// 	})
-
-//   });
+  });
 
 //const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
@@ -325,7 +317,7 @@ app.get('/discover', (req, res) => {
     })
     .then(response => {
        // console.log(response.data);
-        res.render('pages/discover', { playlists: response.data.items }); // Assuming you have a view file to display playlists
+        res.render('pages/discover', { playlists: response.data.items, settings: settings.option2}); // Assuming you have a view file to display playlists
     })
     .catch(error => {
         console.error('Error fetching playlists:', error);
