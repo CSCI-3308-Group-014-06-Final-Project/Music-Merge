@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome, {{user.display_name}}</h1>
+        <p>Followers: {{user.followers.total}}</p>
+
+        <h2>Links</h2>
+        <ul>
+            <li><a href="{{user.external_urls.spotify}}">Spotify Profile</a></li>
+        </ul>
+
+        <h2>Profile Image</h2>
+        {{#if user.images.length}}
+        {{#each user.images}}
+        <img src="{{this.url}}" alt="Profile Image" style="max-width: 200px;">
+        {{/each}}
+        {{else}}
+        <p>No profile image available.</p>
+        {{/if}}
+    </div>
+</body>
+
+</html>
