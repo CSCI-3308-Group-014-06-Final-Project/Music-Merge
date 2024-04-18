@@ -377,6 +377,8 @@ app.post('/merge', async (req, res) => {
 		})
 
 	const newPlaylist = response.data;
+
+	let trackURIs = [];
 	
 	for (const ID of playlistIDs) {
 		const responseA = 
@@ -391,6 +393,11 @@ app.post('/merge', async (req, res) => {
 
 		let playlistItemArray = responseA.data.tracks.items;
 		for (item of playlistItemArray) {
+			trackURIs.push(item.track.uri);
+		}
+	}
+	while(trackURIs) {
+		if (trackURIs.length < 100) {
 			const responseB =
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${newPlaylist.id}/tracks`,
@@ -400,11 +407,31 @@ app.post('/merge', async (req, res) => {
 						Authorization: accessString
 					},
 					data: {
-						"uris": [item.track.uri],
+						"uris": trackURIs,
 					}
-				})
+				});
+			trackURIs = 0;
+		} else {
+			const temp = trackURIs.slice(100);
+			const postURIs = trackURIs.splice(0,100);
+			const responseB =
+				await axios({
+					url: `https://api.spotify.com/v1/playlists/${newPlaylist.id}/tracks`,
+					method: `POST`,
+					dataType: `json`,
+					headers: {
+						Authorization: accessString
+					},
+					data: {
+						"uris": trackURIs,
+					}
+				});
+			trackURIs = temp;
 		}
 	}
+
+	const query = `INSERT INTO playlists (playlistID, spotifyUsername, playlistName) VALUES ($1, $2, $3) returning * ;`;
+	db.one(query, [newPlaylist.id, user.id, newPlaylist.name]);
 });
 
 async function addTrack(trackURI, playlistID, accessStr) {
