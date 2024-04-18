@@ -49,8 +49,8 @@ POSTGRES_PASSWORD="pwd"
 POSTGRES_DB="users"
 
 # Node vars
-SESSION_SECRET="super duper secret!"
-API_KEY="hcaj7Z7rmERbfgzQrHCy3IPaXvElhVGs"
+SESSION_SECRET="febdecba354845d2b88944e98fe9dd50"
+API_KEY="603b2cf1577c4343a3e7a378ace0be6c"
 ```
 
 # Link to Application
