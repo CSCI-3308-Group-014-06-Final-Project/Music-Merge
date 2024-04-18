@@ -1,5 +1,5 @@
 {
-    "name": "<TODO: MusicMerge>",
+    "name": "Music-Merge>",
     "main": "src/index.js",
     "dependencies": {
       "express": "^4.6.1",
@@ -20,7 +20,7 @@
     },
     "scripts": {
       "prestart": "npm install",
-      "start": "nodemon index.js",
+      "start": "nodemon src/index.js",
       "test": "mocha",
       "testandrun": "npm run prestart && npm run test && npm start"
     }

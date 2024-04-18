@@ -1,0 +1,32 @@
+Users should be able to register for Music-Merge by linking their Spotify account.
+Test Data: we will use username: tester1, password: testpwd, Spotify account: nbschwa@academic.district70.org.
+Acceptance Criteria:
+- A user cannot submit the register form without completing all of the mandatory fields. Mandatory fields include:
+  - Name
+  - Password
+  - Spotify Account
+- Information from the form is stored in the user database.
+- Localhost will be used to simulate a realistic user environment.
+- Toby will act as the User Acceptance Tester.
+
+Users should be able to login to Music-Merge by entering the data they previously used to register.
+Test Data: we will use username: tester1, password: testpwd.
+Acceptance Criteria:
+- A user cannot submit the login form without completing all of the mandatory fields. Mandatory fields include:
+  - Name
+  - Password
+- The login page will not work unless both Name and Password are correct.
+- Information from the form is cross-referenced with the user database.
+- Localhost will be used to simulate a realistic user environment.
+- Kelly will act as the User Acceptance Tester.
+
+Users should be able to navigate to the merge page, check 2 playlists, click merge, and receive a message saying “Playlists Merged.”
+Test Data: we will be logged in with username: tester1, password: testpwd. We will select the first 2 playlists to merge.
+Acceptance Criteria:
+- A user cannot submit the merge request without completing all of the mandatory steps. Steps include:
+  - Checking playlist #1
+  - Checking playlist #2
+  - Selecting “Merge Playlists”
+- Information from the form is used to make a call to the API which creates a new playlist. This playlist is stored in the playlists database.
+- Localhost will be used to simulate a realistic user environment.
+- Noah will act as the User Acceptance Tester.
