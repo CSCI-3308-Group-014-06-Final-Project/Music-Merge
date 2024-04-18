@@ -1,108 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Playlist Selection</title>
-<style>
-  footer {
-    height: 50px; /* Adjust the value as needed */
-  }
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f4f4f4;
-  }
-  h1 {
-    color: #333;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  td, th {
-    text-align: left;
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-  }
-  img {
-    border-radius: 5px;
-  }
-  .playlist-checkbox {
-    transform: scale(1.5);
-    margin-right: 10px;
-  }
-  .btn-primary {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .btn-primary:hover {
-    background-color: #0056b3;
-  }
-  .submit-btn-container {
-    text-align: center;
-    margin-top: 20px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlist Selection</title>
+  <style>
+    footer {
+      height: 50px;
+      /* Adjust the value as needed */
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    td,
+    th {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    img {
+      border-radius: 5px;
+    }
+
+    .playlist-checkbox {
+      transform: scale(1.5);
+      margin-right: 10px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .submit-btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>Playlists Page</h1>
-<form id="playlistsForm">
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Image</th>
-      <th>Owner</th>
-      <th>Tracks Count</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each playlists}}
-    <tr>
-      <td>{{this.name}}</td>
-      <td>
-        {{#if this.images}}
-          {{#if this.images.[0]}}
-            <img src="{{this.images.[0].url}}" alt="Playlist Image" style="width:100px; height: 60px; object-fit: cover;">
-          {{else}}
-            <img src="../../views/images/default.jpg" alt="Default Image" style="width:100px; height: 60px; object-fit: cover;">
-          {{/if}}
-        {{else}}
-          <img src="../../views/images/default.jpg" alt="Default Image" style="width:100px; height: 60px; object-fit: cover;">
-        {{/if}}
-      </td>
-      <td>{{this.owner.display_name}}</td>
-      <td>{{this.tracks.total}}</td>
-      <td>
-        <input type="checkbox" class="playlist-checkbox" name="playlist" value="{{this.id}}">
-      </td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
-<div class="submit-btn-container">
-  <button type="submit" class="btn-primary">Merge Playlists</button>
-</div>
-</form>
+  <h1>Playlists Page</h1>
+  <form id="playlistsForm">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Image</th>
+          <th>Owner</th>
+          <th>Tracks Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each playlists}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>
+            {{#if this.images}}
+            {{#if this.images.[0]}}
+            <img src="{{this.images.[0].url}}" alt="Playlist Image"
+              style="width:100px; height: 60px; object-fit: cover;">
+            {{else}}
+            <img src="../../views/images/default.jpg" alt="Default Image"
+              style="width:100px; height: 60px; object-fit: cover;">
+            {{/if}}
+            {{else}}
+            <img src="../../views/images/default.jpg" alt="Default Image"
+              style="width:100px; height: 60px; object-fit: cover;">
+            {{/if}}
+          </td>
+          <td>{{this.owner.display_name}}</td>
+          <td>{{this.tracks.total}}</td>
+          <td>
+            <input type="checkbox" class="playlist-checkbox" name="playlist" value="{{this.id}}"
+              data-uri="{{this.uri}}">
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <div class="submit-btn-container">
+      <button type="submit" class="btn-primary">Merge Playlists</button>
+    </div>
+    <div id="mergeMessage" style="text-align:center; color: green; margin-top: 20px;"></div> <!-- Message placeholder -->
+  </form>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const MAX_CHECKED_COUNT = 2;
+  const form = document.getElementById('playlistsForm');
   const checkboxes = document.querySelectorAll('.playlist-checkbox');
-  const form = document.getElementById('playlistsForm'); // Get the form by ID
+  const messageDiv = document.getElementById('mergeMessage'); // Get the message div
 
   function updateCheckboxState() {
     const checkedCount = document.querySelectorAll('.playlist-checkbox:checked').length;
     checkboxes.forEach(checkbox => {
-      if (checkedCount >= MAX_CHECKED_COUNT) {
+      if (checkedCount >= 2) {
         checkbox.disabled = checkbox.checked ? false : true;
       } else {
         checkbox.disabled = false;
@@ -114,14 +132,29 @@ document.addEventListener('DOMContentLoaded', function () {
     checkbox.addEventListener('change', updateCheckboxState)
   );
 
-  // Add an event listener to the form's submit event
   form.addEventListener('submit', function(event) {
-   // event.preventDefault(); // Prevent form from submitting normally
-    console.log('success'); // Log success message to the console
+    event.preventDefault(); // Prevent the form from submitting in the traditional way
+    const selectedPlaylistURIs = [];
+    document.querySelectorAll('.playlist-checkbox:checked').forEach(checkbox => {
+      const playlistURI = checkbox.getAttribute('data-uri');
+      selectedPlaylistURIs.push(playlistURI);
+    });
+    console.log('Selected Playlist URIs:', selectedPlaylistURIs);
+
+    // Display the success message
+    if (selectedPlaylistURIs.length > 0) { // Check if at least one playlist is selected
+      messageDiv.textContent = 'Playlists successfully merged';
+    } else {
+      messageDiv.textContent = ''; // Clear message if no playlists are selected
+    }
   });
 });
 </script>
 
 
+
+
+
 </body>
+
 </html>
