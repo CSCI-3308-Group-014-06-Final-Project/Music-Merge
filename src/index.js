@@ -494,6 +494,7 @@ app.post('/merge', async (req, res) => {
 				});
 			});
 		});
+		res.redirect('/');
 });
 
 /*
