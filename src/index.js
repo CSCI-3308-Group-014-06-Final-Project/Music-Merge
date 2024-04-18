@@ -403,16 +403,28 @@ app.get('/test', async (req, res) => {
 
 //create playlist and add in tracks
 //in progress
-app.post('/test2', async (req, res) => {
+app.post('/merge', async (req, res) => {
+
 	const user = await fetchProfile(accessToken).id;
-	const playlistName = req.query.name;
-	const playlistIsPublic = req.query.public;
-	const IsCollaborative = req.query.collaborative;
-	const playlistDescription = req.query.description;
-	const accessString = `bearer` + getAccessToken(clientId, req.query.code);
-	const response =
+	const accessString = `Bearer ${accessToken}`;
+
+	//playlist params, if possible to no be hard coded later on
+	const playlistName = "The Playlist!" //req.query.name;
+	const playlistIsPublic = false; //req.query.public;
+	const IsCollaborative = false; //req.query.collaborative;
+	const playlistDescription = "Your Newly Merged Playlist!" //req.query.description;
+
+	let playlistIDs = [];
+	//handling for two recived playlist URIs
+	req.body.selectedPlaylistURIs.forEach(uri => {
+		if(uri.substring(0,8) == ``){
+			playlistIDs.push(uri.slice(8));
+		}
+	});
+	
+	const newPlaylist =
 		await axios({
-			url: `https:\\api.spotify.com/v1/users/${user}/playlists`,
+			url: `https://api.spotify.com/v1/users/${user}/playlists`,
 			method: `POST`,
 			dataType: `json`,
 			headers: {
@@ -424,9 +436,9 @@ app.post('/test2', async (req, res) => {
 				collaborative: IsCollaborative,
 				description: playlistDescription
 			},
-		}).then(async results => {
-			const playlistId = results.id;
-			const songsToAdd = getSongsToAdd(); //empty function write later, note max of 100, returns array of spotify uri's for tracks
+		/*}).then(async results => {
+			//const playlistId = results.id;
+			//const songsToAdd = getSongsToAdd(); //empty function write later, note max of 100, returns array of spotify uri's for tracks
 			const response =
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
@@ -445,9 +457,41 @@ app.post('/test2', async (req, res) => {
 					results: [];
 					res.render('pages/test', { message: "Error loading Laufey events please try again" });
 				});
+				*/
 		}).catch(error => {
 			results: [];
 			res.render('pages/test', { message: "Error loading Laufey events please try again" });
+		});
+
+		playlistID.forEach({ID => 
+			let playlist = 
+				await axios({
+					url: `https://api.spotify.com/v1/playlists/${ID}`,
+					method: `GET`,
+					dataType: `json`,
+					headers: {
+						Authorization: accessString
+					},
+				}).catch(error => {
+					results: [];
+					res.render('pages/test', { message: "Error loading Laufey events please try again" });
+				});
+			playlist.tracks.items.forEach({item => 
+				await axios({
+					url: `https://api.spotify.com/v1/playlists/${ID}/tracks`,
+					method: `POST`,
+					dataType: `json`,
+					headers: {
+						Authorization: accessString
+					},
+					params: {
+						uris: item.track.trackObject.preview_uri,
+					},
+				}).catch(error => {
+					results: [];
+					res.render('pages/test', { message: "Error loading Laufey events please try again" });
+				});
+			});
 		});
 });
 
