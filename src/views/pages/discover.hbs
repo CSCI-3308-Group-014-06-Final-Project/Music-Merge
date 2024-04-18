@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Event Selection</title>
+<title>Playlist Selection</title>
 <style>
   footer {
-  height: 50px; /* Adjust the value as needed */
-}
+    height: 50px; /* Adjust the value as needed */
+  }
   body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -29,7 +29,7 @@
   img {
     border-radius: 5px;
   }
-  .event-checkbox {
+  .playlist-checkbox {
     transform: scale(1.5);
     margin-right: 10px;
   }
@@ -53,38 +53,38 @@
 </head>
 <body>
 
-<h1>Discover Page</h1>
-<form id="eventsForm">
+<h1>Playlists Page</h1>
+<form id="playlistsForm">
 <table>
   <thead>
-      <tr>
+    <tr>
       <th>Name</th>
       <th>Image</th>
-      <th>Number of Songs</th>
-      <th>Run-Time</th>
+      <th>Owner</th>
+      <th>Tracks Count</th>
     </tr>
   </thead>
   <tbody>
-    {{#each events}}
-      <tr>
-        <td>{{this.name}}</td>
-        <td>
-          {{#if this.images}}
-            {{#if this.images.[0]}}
-              <img src="{{this.images.[0].url}}" alt="Event Image" style="width:100px; height: 60px; object-fit: cover;">
-            {{else}}
-              <img src="../../views/images/default.jpg" alt="Default Image" style="width:100px; height: 60px; object-fit: cover;">
-            {{/if}}
+    {{#each playlists}}
+    <tr>
+      <td>{{this.name}}</td>
+      <td>
+        {{#if this.images}}
+          {{#if this.images.[0]}}
+            <img src="{{this.images.[0].url}}" alt="Playlist Image" style="width:100px; height: 60px; object-fit: cover;">
           {{else}}
             <img src="../../views/images/default.jpg" alt="Default Image" style="width:100px; height: 60px; object-fit: cover;">
           {{/if}}
-        </td>
-        <td>30</td>
-        <td>{{this.dates.start.localTime}}</td>
-        <td>
-            <input type="checkbox" class="event-checkbox" name="event" value="{{this.id}}">
-        </td>
-      </tr>
+        {{else}}
+          <img src="../../views/images/default.jpg" alt="Default Image" style="width:100px; height: 60px; object-fit: cover;">
+        {{/if}}
+      </td>
+      <td>{{this.owner.display_name}}</td>
+      <td>{{this.tracks.total}}</td>
+      <td>
+        <input type="checkbox" class="playlist-checkbox" name="playlist" value="{{this.id}}">
+      </td>
+    </tr>
     {{/each}}
   </tbody>
 </table>
@@ -94,13 +94,13 @@
 </form>
 
 <script>
-// JavaScript from previous example
 document.addEventListener('DOMContentLoaded', function () {
   const MAX_CHECKED_COUNT = 2;
-  const checkboxes = document.querySelectorAll('.event-checkbox');
+  const checkboxes = document.querySelectorAll('.playlist-checkbox');
+  const form = document.getElementById('playlistsForm'); // Get the form by ID
 
   function updateCheckboxState() {
-    const checkedCount = document.querySelectorAll('.event-checkbox:checked').length;
+    const checkedCount = document.querySelectorAll('.playlist-checkbox:checked').length;
     checkboxes.forEach(checkbox => {
       if (checkedCount >= MAX_CHECKED_COUNT) {
         checkbox.disabled = checkbox.checked ? false : true;
@@ -113,8 +113,15 @@ document.addEventListener('DOMContentLoaded', function () {
   checkboxes.forEach(checkbox => 
     checkbox.addEventListener('change', updateCheckboxState)
   );
+
+  // Add an event listener to the form's submit event
+  form.addEventListener('submit', function(event) {
+   // event.preventDefault(); // Prevent form from submitting normally
+    console.log('success'); // Log success message to the console
+  });
 });
 </script>
+
 
 </body>
 </html>
