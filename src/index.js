@@ -339,8 +339,8 @@ app.get('/welcome', (req, res) => {
 //in progress
 app.post('/merge', async (req, res) => {
 
-	const user = await fetchProfile(accessToken);
-	const accessString = `Bearer ${accessToken}`;
+	const user = await fetchProfile(req.session.token);
+	const accessString = `Bearer ${req.session.token}`;
 
 	//playlist params, if possible to no be hard coded later on
 	const playlistName = "The Playlist!" //req.query.name;
@@ -396,8 +396,8 @@ app.post('/merge', async (req, res) => {
 			trackURIs.push(item.track.uri);
 		}
 	}
-	while(trackURIs) {
-		if (trackURIs.length < 100) {
+	while(trackURIs.length > 0) {
+		if (trackURIs.length <= 100) {
 			const responseB =
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${newPlaylist.id}/tracks`,
@@ -410,7 +410,7 @@ app.post('/merge', async (req, res) => {
 						"uris": trackURIs,
 					}
 				});
-			trackURIs = 0;
+			trackURIs = [];
 		} else {
 			const temp = trackURIs.slice(100);
 			const postURIs = trackURIs.splice(0,100);
