@@ -65,8 +65,8 @@ db.connect()
 // *****************************************************
 
 
-//const clientId = process.env.API_KEY;
-const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
+const clientId = process.env.API_KEY;
+//const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
 //Register - need to fix to connect and work on hash
 app.post('/register', async (req, res) => {
