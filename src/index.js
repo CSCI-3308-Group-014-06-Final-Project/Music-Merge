@@ -474,7 +474,7 @@ app.post('/merge', async (req, res) => {
 			res.render('pages/test', { message: "Error loading Laufey events please try again" });
 		});
 
-		playlistID.forEach({ID => 
+		playlistID.forEach(ID => {
 			let playlist = 
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${ID}`,
@@ -487,7 +487,7 @@ app.post('/merge', async (req, res) => {
 					results: [];
 					res.render('pages/test', { message: "Error loading Laufey events please try again" });
 				});
-			playlist.tracks.items.forEach({item => 
+			playlist.tracks.items.forEach(item => {
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${ID}/tracks`,
 					method: `POST`,
