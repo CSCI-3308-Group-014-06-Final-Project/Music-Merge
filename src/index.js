@@ -13,6 +13,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcrypt'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+let loggedIn = false;
 
 const hbs = handlebars.create({
 	extname: 'hbs',
@@ -270,10 +271,12 @@ app.post('/login', (req, res) => {
 	const query = 'select * from users where users.username = $1 AND users.password = $2 LIMIT 1'; //Not sure about this
 	const values = [username, password];
 	console.log(req);
+	
 
 	db.one(query, values)
 		.then(data => {
 			//Update session data with users info (not in db yet)
+			loggedIn = true;
 			res.redirect('/'); //Redirect home with updated session
 		})
 		.catch(err => {
@@ -290,13 +293,20 @@ app.get('/logout', auth, (req, res) => {
 			console.error('Error destroying session:', err);
 		}
 		// Render the logout page with a success message
+		loggedIn = false;
 		res.render('pages/logout', { message: 'Logged out Successfully' });
 	});
 });
 
 //Settings Page
 app.get('/settings', (req, res) => {
+    if(loggedIn)
+	{
 	res.render('pages/settings');
+	}
+	else{
+		res.render('pages/login');
+	}
 })
 
 app.post('/settings', (req, res) => {
@@ -317,7 +327,14 @@ app.get('/discover', (req, res) => {
 	})
 		.then(response => {
 			// console.log(response.data);
-			res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
+			if(loggedIn)
+			{
+				res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
+			}
+			else{
+				res.render('pages/login');
+			}
+			
 		})
 		.catch(error => {
 			console.error('Error fetching playlists:', error);

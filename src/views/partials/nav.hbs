@@ -13,22 +13,25 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ml-auto">
-     
-      <li class="nav-item">
-        <a class="nav-link" href="/login">Login</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/register">Register</a>
-      </li>
-      {{#if loggedIn}}
+     {{#if loggedIn}}
        <li class="nav-item active">
         <a class="nav-link" href="/">Home</a>
+      </li>
+       <li class="nav-item active">
+        <a class="nav-link" href="/discover">Discover</a>
       </li>
       <li class="nav-item">
         <a href="/settings" class="nav-link">Settings</a>
       </li>
        <li class="nav-item">
         <a class="nav-link" href="/logout">Logout</a>
+      </li>
+      {{else}}
+      <li class="nav-item">
+        <a class="nav-link" href="/login">Login</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/register">Register</a>
       </li>
     </ul>
   </div>
