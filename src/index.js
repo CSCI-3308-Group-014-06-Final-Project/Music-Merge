@@ -79,19 +79,18 @@ app.post('/register', async (req, res) => {
 	// To-DO: Insert username and hashed password into the 'users' table
 
 	// db.any(query, [req.body.username, hash])
-	if (req.body.username == "" || req.body.password == "") {
-		throw new Error('Cannot be empty! Please input a username and password.');
+	if (req.body.spotifyUsername == "") {
+		throw new Error('Cannot be empty! Please input a spotifyUsername');
 	}
 
-	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
-	db.any(query, [req.body.username, req.body.password])
+	const query = "INSERT INTO users (spotifyUsername) VALUES ($1) RETURNING*;"
+	db.any(query, [req.body.spotifyUsername])
 		.then(function (data) {
 			console.log(data)
 			// do we want a successful registration to redirect to the login page?
 			//res.redirect("/login")
 		})
 
-		// need to change so that an error redirects to the login page, since thats how we wrote the test
 		.catch(function (error) {
 			//res.redirect("/register")
 		})
