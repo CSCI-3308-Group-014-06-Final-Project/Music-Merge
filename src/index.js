@@ -69,7 +69,7 @@ db.connect()
 const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
 //Register - need to fix to connect and work on hash
-app.post('/register', async(req, res) => {
+app.post('/register', async (req, res) => {
 	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
 	res.redirect(result); // Use the result for redirection or response
 	// need to fix hashing, gotta put async in the app line when we do
@@ -78,24 +78,24 @@ app.post('/register', async(req, res) => {
 	// To-DO: Insert username and hashed password into the 'users' table
 
 	// db.any(query, [req.body.username, hash])
-	if(req.body.username == "" || req.body.password == ""){
+	if (req.body.username == "" || req.body.password == "") {
 		throw new Error('Cannot be empty! Please input a username and password.');
 	}
 
 	const query = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING*;"
 	db.any(query, [req.body.username, req.body.password])
-	.then(function(data){
-	  console.log(data)
-	  // do we want a successful registration to redirect to the login page?
-	  //res.redirect("/login")
-	})
+		.then(function (data) {
+			console.log(data)
+			// do we want a successful registration to redirect to the login page?
+			//res.redirect("/login")
+		})
 
-	// need to change so that an error redirects to the login page, since thats how we wrote the test
-	.catch(function(error){
-	  //res.redirect("/register")
-	})
+		// need to change so that an error redirects to the login page, since thats how we wrote the test
+		.catch(function (error) {
+			//res.redirect("/register")
+		})
 
-  });
+});
 
 //const clientId = "603b2cf1577c4343a3e7a378ace0be6c";
 
@@ -224,24 +224,24 @@ const auth = (req, res, next) => {
 };
 
 app.get('/', (req, res) => {
-    axios({
-        url: `https://api.spotify.com/v1/users/${profile.id}`,
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`, // Your Spotify Access Token
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        console.log(response.data);
-        res.render('pages/home', {
-            user: response.data // Pass the entire user object to the view
-        });
-    })
-    .catch(error => {
-        console.error('Error fetching user data:', error);
-        res.status(500).send('Failed to retrieve user data');
-});
+	axios({
+		url: `https://api.spotify.com/v1/users/${profile.id}`,
+		method: 'GET',
+		headers: {
+			'Authorization': `Bearer ${accessToken}`, // Your Spotify Access Token
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(response => {
+			console.log(response.data);
+			res.render('pages/home', {
+				user: response.data // Pass the entire user object to the view
+			});
+		})
+		.catch(error => {
+			console.error('Error fetching user data:', error);
+			res.status(500).send('Failed to retrieve user data');
+		});
 
 });
 
@@ -257,7 +257,7 @@ app.get('/register', (req, res) => {
 // 	console.log(profile);
 // });
 
-app.get('/login', async(req, res) => { //Login attempt
+app.get('/login', async (req, res) => { //Login attempt
 	const code = req.query.code; // This captures the code from the URL
 	accessToken = await getAccessToken(clientId, code);
 	profile = await fetchProfile(accessToken);
@@ -307,22 +307,22 @@ app.post('/settings', (req, res) => {
 })
 // Make sure to apply the auth middleware to the /discover route
 app.get('/discover', (req, res) => {
-    axios({
-        url: `https://api.spotify.com/v1/users/${profile.id}/playlists`,
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`, // Make sure you have your access token
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-       // console.log(response.data);
-        res.render('pages/discover', { playlists: response.data.items, settings: settings.option2}); // Assuming you have a view file to display playlists
-    })
-    .catch(error => {
-        console.error('Error fetching playlists:', error);
-        res.status(500).send('Failed to retrieve playlists');
-    });
+	axios({
+		url: `https://api.spotify.com/v1/users/${profile.id}/playlists`,
+		method: 'GET',
+		headers: {
+			'Authorization': `Bearer ${accessToken}`, // Make sure you have your access token
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(response => {
+			// console.log(response.data);
+			res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
+		})
+		.catch(error => {
+			console.error('Error fetching playlists:', error);
+			res.status(500).send('Failed to retrieve playlists');
+		});
 });
 
 app.get('/welcome', (req, res) => {
@@ -427,12 +427,13 @@ app.post('/merge', async (req, res) => {
 	let playlistIDs = [];
 	//handling for two recived playlist URIs
 	//basic uri grab
+	console.log(req.body.selectedPlaylistURIs);
 	req.body.selectedPlaylistURIs.forEach(uri => {
 		if(uri.substring(0,17) == `spotify:playlist:`){
 			playlistIDs.push(uri.slice(17));
 		}
 	});
-	
+
 	const newPlaylist =
 		await axios({
 			url: `https://api.spotify.com/v1/users/${user}/playlists`,
@@ -447,34 +448,12 @@ app.post('/merge', async (req, res) => {
 				collaborative: IsCollaborative,
 				description: playlistDescription
 			},
-		/*}).then(async results => {
-			//const playlistId = results.id;
-			//const songsToAdd = getSongsToAdd(); //empty function write later, note max of 100, returns array of spotify uri's for tracks
-			const response =
-				await axios({
-					url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-					method: `POST`,
-					dataType: `json`,
-					headers: {
-						Authorization: accessString
-					},
-					params: {
-						position: 0,
-						uris: songsToAdd,
-					},
-				}).then(results => {
-					console.log("success!");
-				}).catch(error => {
-					results: [];
-					res.render('pages/test', { message: "Error loading Laufey events please try again" });
-				});
-				*/
 		}).catch(error => {
 			results: [];
 			res.render('pages/test', { message: "Error loading Laufey events please try again" });
 		});
 
-		playlistID.forEach(ID => {
+		playlistIDs.forEach(async ID => {
 			let playlist = 
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${ID}`,
@@ -487,9 +466,9 @@ app.post('/merge', async (req, res) => {
 					results: [];
 					res.render('pages/test', { message: "Error loading Laufey events please try again" });
 				});
-			playlist.tracks.items.forEach(item => {
+			playlist.tracks.items.forEach(async item => {
 				await axios({
-					url: `https://api.spotify.com/v1/playlists/${ID}/tracks`,
+					url: `https://api.spotify.com/v1/playlists/${newPlaylist.ID}/tracks`,
 					method: `POST`,
 					dataType: `json`,
 					headers: {
@@ -504,7 +483,7 @@ app.post('/merge', async (req, res) => {
 				});
 			});
 		});
-		res.redirect('/');
+	res.redirect('/');
 });
 
 /*

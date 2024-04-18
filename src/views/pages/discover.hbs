@@ -78,9 +78,23 @@
         });
         console.log('Selected Playlist URIs:', selectedPlaylistURIs);
         if (selectedPlaylistURIs.length > 0) {
-          messageDiv.textContent = 'Playlists successfully merged';
+          fetch('/merge', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ selectedPlaylistURIs })
+          })
+            .then(response => {
+              // Handle the response from the server
+              console.log('Response from /home:', response);
+            })
+            .catch(error => {
+              // Handle any errors
+              console.error('Error:', error);
+            });
         } else {
-          messageDiv.textContent = '';
+          messageDiv.textContent = ''; // Clear message if no playlists are selected
         }
       });
     });
