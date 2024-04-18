@@ -423,24 +423,6 @@ async function addTrack(trackURI, playlistID, accessStr) {
 
 }
 
-/*
-async function quickAuth() {
-	const response = 
-		await axios.post(
-			'https://accounts.spotify.com/api/token',
-			new URLSearchParams({
-			  'grant_type': 'client_credentials',
-			  'client_id': process.env.API_KEY,
-			  'client_secret': process.env.SESSION_SECRET
-			})
-		).catch(error => {
-			console.log("uh-oh");
-		});
-
-	return response.access_token;
-};
-*/
-
 async function getTrackInfo(access_token) {
 	const response = await fetch("https://api.spotify.com/v1/search?q=remaster%2520track%3ADoxy%2520artist%3AMiles%2520Davis&type=album", {
 		method: 'GET',
