@@ -416,9 +416,10 @@ app.post('/merge', async (req, res) => {
 
 	let playlistIDs = [];
 	//handling for two recived playlist URIs
+	//basic uri grab
 	req.body.selectedPlaylistURIs.forEach(uri => {
-		if(uri.substring(0,8) == ``){
-			playlistIDs.push(uri.slice(8));
+		if(uri.substring(0,17) == `spotify:playlist:`){
+			playlistIDs.push(uri.slice(17));
 		}
 	});
 	
