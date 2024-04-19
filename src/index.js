@@ -254,10 +254,10 @@ app.get('/login', async (req, res) => { //Login attempt
 });
 
 app.post('/login', (req, res) => {
-	const username = req.body.username;
-	const password = req.body.password;
-	const query = 'select * from users where users.username = $1 AND users.password = $2 LIMIT 1'; //Not sure about this
-	const values = [username, password];
+	const spotifyUsername = req.body.spotifyUsername;
+	// const password = req.body.password;
+	const query = 'select * from users where users.spotifyUsername = $1'; //Not sure about this
+	const values = [spotifyUsername];
 	console.log(req);
 	
 
