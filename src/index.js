@@ -423,7 +423,7 @@ app.post('/merge', async (req, res) => {
 						Authorization: accessString
 					},
 					data: {
-						"uris": trackURIs,
+						"uris": postURIs,
 					}
 				});
 			trackURIs = temp;
