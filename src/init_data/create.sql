@@ -1,3 +1,5 @@
+CREATE DATABASE "users-db";
+
 CREATE TABLE IF NOT EXISTS users (
 	spotifyUsername VARCHAR(50) PRIMARY KEY NOT NULL
 );
