@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+
+  <h1>Your Merged Playlists</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Image</th>
+          <th>Owner</th>
+          <th>Tracks Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each playlists}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>
+            {{#if this.images}}
+            {{#if this.images.[0]}}
+            <img src="{{this.images.[0].url}}" alt="Playlist Image"
+              style="width:100px; height: 60px; object-fit: cover;">
+            {{else}}
+            <img src="../../views/images/default.jpg" alt="Default Image"
+              style="width:100px; height: 60px; object-fit: cover;">
+            {{/if}}
+            {{else}}
+            <img src="../../views/images/default.jpg" alt="Default Image"
+              style="width:100px; height: 60px; object-fit: cover;">
+            {{/if}}
+          </td>
+          <td>{{this.owner.display_name}}</td>
+          <td>{{this.tracks.total}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+</body>
+
+</html>
