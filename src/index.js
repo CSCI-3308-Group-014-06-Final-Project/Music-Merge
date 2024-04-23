@@ -339,8 +339,8 @@ app.get('/welcome', (req, res) => {
 //in progress
 app.post('/merge', async (req, res) => {
 
-	const user = await fetchProfile(req.session.token);
-	const accessString = `Bearer ${req.session.token}`;
+	const user = await fetchProfile(accessToken);
+	const accessString = `Bearer ${accessToken}`;
 
 	//playlist params, if possible to no be hard coded later on
 	const playlistName = "The Playlist!" //req.query.name;
@@ -381,20 +381,32 @@ app.post('/merge', async (req, res) => {
 	let trackURIs = [];
 	
 	for (const ID of playlistIDs) {
-		const responseA = 
-			await axios({
-				url: `https://api.spotify.com/v1/playlists/${ID}`,
-				method: `GET`,
-				dataType: `json`,
-				headers: {
-					Authorization: accessString
-				},
-			});
-
-		let playlistItemArray = responseA.data.tracks.items;
-		for (item of playlistItemArray) {
-			trackURIs.push(item.track.uri);
-		}
+		let offset = 0;
+		do{
+			const responseA = 
+				await axios({
+					url: `https://api.spotify.com/v1/playlists/${ID}/tracks`,
+					method: `GET`,
+					dataType: `json`,
+					headers: {
+						Authorization: accessString
+					},
+					params: {
+						offset: offset
+					}
+				});
+			if(responseA.data.items.length == 0){
+				break;
+			}
+			let playlistItemArray = responseA.data.items;
+			for (item of playlistItemArray) {
+				if(item.track === null) {
+					break;
+				}
+				trackURIs.push(item.track.uri);
+			}
+			offset = offset + 100;
+		} while (true)
 	}
 	while(trackURIs.length > 0) {
 		if (trackURIs.length <= 100) {
@@ -430,8 +442,10 @@ app.post('/merge', async (req, res) => {
 		}
 	}
 
+	/*
 	const query = `INSERT INTO playlists (playlistID, spotifyUsername, playlistName) VALUES ($1, $2, $3) returning * ;`;
 	db.one(query, [newPlaylist.id, user.id, newPlaylist.name]);
+	*/
 });
 
 async function addTrack(trackURI, playlistID, accessStr) {
