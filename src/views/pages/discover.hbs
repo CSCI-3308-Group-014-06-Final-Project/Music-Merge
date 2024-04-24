@@ -1,53 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .playlist-img {
+      width: 100px;
+      height: 60px;
+      object-fit: cover;
+    }
+    .submit-btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
 <body>
+  <div class="container mt-4">
+    <h1 class="text-center">Merge Playlists Page</h1>
+    <form id="playlistsForm">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Owner</th>
+            <th>Tracks Count</th>
+            <th>Select</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each playlists}}
+          <tr>
+            <td>{{this.name}}</td>
+            <td>
+              {{#if this.images}}
+                {{#if this.images.[0]}}
+                  <img src="{{this.images.[0].url}}" alt="Playlist Image" class="playlist-img">
+                {{else}}
+                  <img src="../../views/images/default.jpg" alt="Default Image" class="playlist-img">
+                {{/if}}
+              {{else}}
+                <img src="../../views/images/default.jpg" alt="Default Image" class="playlist-img">
+              {{/if}}
+            </td>
+            <td>{{this.owner.display_name}}</td>
+            <td>{{this.tracks.total}}</td>
+            <td>
+              <input type="checkbox" class="playlist-checkbox" name="playlist" value="{{this.id}}" data-uri="{{this.uri}}">
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <div class="submit-btn-container">
+        <button type="submit" class="btn btn-primary">Merge Playlists</button>
+      </div>
+      <div id="mergeMessage" class="text-center text-success mt-3"></div>
+    </form>
+  </div>
 
-  <h1>Merge Playlists Page</h1>
-  <form id="playlistsForm">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Image</th>
-          <th>Owner</th>
-          <th>Tracks Count</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each playlists}}
-        <tr>
-          <td>{{this.name}}</td>
-          <td>
-            {{#if this.images}}
-            {{#if this.images.[0]}}
-            <img src="{{this.images.[0].url}}" alt="Playlist Image"
-              style="width:100px; height: 60px; object-fit: cover;">
-            {{else}}
-            <img src="../../views/images/default.jpg" alt="Default Image"
-              style="width:100px; height: 60px; object-fit: cover;">
-            {{/if}}
-            {{else}}
-            <img src="../../views/images/default.jpg" alt="Default Image"
-              style="width:100px; height: 60px; object-fit: cover;">
-            {{/if}}
-          </td>
-          <td>{{this.owner.display_name}}</td>
-          <td>{{this.tracks.total}}</td>
-          <td>
-            <input type="checkbox" class="playlist-checkbox" name="playlist" value="{{this.id}}"
-              data-uri="{{this.uri}}">
-          </td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
-    <div class="submit-btn-container">
-      <button type="submit" class="btn-primary">Merge Playlists</button>
-    </div>
-    <div id="mergeMessage" style="text-align:center; color: green; margin-top: 20px;"></div>
-  </form>
-
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.getElementById('playlistsForm');
@@ -57,26 +70,21 @@
       function updateCheckboxState() {
         const checkedCount = document.querySelectorAll('.playlist-checkbox:checked').length;
         checkboxes.forEach(checkbox => {
-          if (checkedCount >= 2) {
-            checkbox.disabled = checkbox.checked ? false : true;
-          } else {
-            checkbox.disabled = false;
-          }
+          checkbox.disabled = checkedCount >= 2 && !checkbox.checked;
         });
       }
 
-      checkboxes.forEach(checkbox =>
-        checkbox.addEventListener('change', updateCheckboxState)
-      );
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateCheckboxState);
+      });
 
       form.addEventListener('submit', function (event) {
         event.preventDefault();
         const selectedPlaylistURIs = [];
         document.querySelectorAll('.playlist-checkbox:checked').forEach(checkbox => {
-          const playlistURI = checkbox.getAttribute('data-uri');
-          selectedPlaylistURIs.push(playlistURI);
+          selectedPlaylistURIs.push(checkbox.getAttribute('data-uri'));
         });
-        console.log('Selected Playlist URIs:', selectedPlaylistURIs);
+
         if (selectedPlaylistURIs.length > 0) {
           fetch('/merge', {
             method: 'POST',
@@ -85,25 +93,21 @@
             },
             body: JSON.stringify({ selectedPlaylistURIs })
           })
-            .then(response => {
-              // Handle the response from the server
-              console.log('Response from /home:', response);
-            })
-            .catch(error => {
-              // Handle any errors
-              console.error('Error:', error);
-            });
+          .then(response => {
+            if (response.ok) {
+              messageDiv.textContent = 'Playlists successfully merged!';
+            } else {
+              messageDiv.textContent = 'Failed to merge playlists. Please try again.';
+            }
+          })
+          .catch(error => {
+            messageDiv.textContent = 'An error occurred: ' + error.message;
+          });
         } else {
-          messageDiv.textContent = ''; // Clear message if no playlists are selected
+          messageDiv.textContent = 'Please select at least one playlist to merge.';
         }
       });
     });
   </script>
-
-
-
-
-
 </body>
-
 </html>

@@ -72,7 +72,7 @@ const clientId = process.env.API_KEY;
 
 //Register - need to fix to connect and work on hash
 app.post('/register', async (req, res) => {
-	const result = await handleAuthFlow(); // Await the promise from handleAuthFlow
+	const result = await redirectToAuthCodeFlow(clientId);
 	res.redirect(result); // Use the result for redirection or response
 	// need to fix hashing, gotta put async in the app line when we do
 	//hash the password using bcrypt library
@@ -87,7 +87,9 @@ app.post('/register', async (req, res) => {
 	const query = "INSERT INTO users (spotifyUsername) VALUES ($1) RETURNING*;"
 	db.any(query, [req.body.spotifyUsername])
 		.then(function (data) {
-			console.log(data)
+			//console.log(data)
+			req.session.profile = data[0];
+			req.session.loggedIn = true;
 			// do we want a successful registration to redirect to the login page?
 			//res.redirect("/login")
 		})
@@ -98,20 +100,14 @@ app.post('/register', async (req, res) => {
 
 });
 
-let globalUrl;
-let profile;
-let accessToken;
-const params = new URLSearchParams(globalUrl);
-console.log("global" + globalUrl)
-const code = params.get("code");
-async function handleAuthFlow() {
-	if (!code) {
-		return await redirectToAuthCodeFlow(clientId);
-	} else {
-		const accessToken = await getAccessToken(clientId, code);
-		return await fetchProfile(accessToken);
-	}
-}
+// async function handleAuthFlow() {
+// 	if (!req.session.code) {
+// 		return await redirectToAuthCodeFlow(clientId);
+// 	} else {
+// 		const accessToken = await getAccessToken(clientId, code);
+// 		return await fetchProfile(accessToken);
+// 	}
+// }
 
 const storage = {};
 
@@ -166,7 +162,7 @@ async function getAccessToken(clientId, code) {
 		headers: { "Content-Type": "application/x-www-form-urlencoded" },
 		body: params
 	});
-	console.log(params)
+	//console.log(params)
 
 	const { access_token } = await result.json();
 	return access_token;
@@ -213,7 +209,7 @@ const user = {
 
 
 const auth = (req, res, next) => {
-	if (!req.session.user) {
+	if (!req.session.loggedIn) {
 		// Default to login page.
 		return res.redirect('/login');
 	}
@@ -222,15 +218,14 @@ const auth = (req, res, next) => {
 
 app.get('/', (req, res) => {
 	axios({
-		url: `https://api.spotify.com/v1/users/${profile.id}`,
+		url: `https://api.spotify.com/v1/users/${req.session.profile.id}`,
 		method: 'GET',
 		headers: {
-			'Authorization': `Bearer ${accessToken}`, // Your Spotify Access Token
+			'Authorization': `Bearer ${req.session.accessToken}`, // Your Spotify Access Token
 			'Content-Type': 'application/json'
 		}
 	})
 		.then(response => {
-			console.log(response.data);
 			res.render('pages/home', {
 				user: response.data // Pass the entire user object to the view
 			});
@@ -248,8 +243,8 @@ app.get('/register', (req, res) => {
 
 app.get('/login', async (req, res) => { //Login attempt
 	const code = req.query.code; // This captures the code from the URL
-	accessToken = await getAccessToken(clientId, code);
-	profile = await fetchProfile(accessToken);
+	req.session.accessToken = await getAccessToken(clientId, code);
+	req.session.profile = await fetchProfile(req.session.accessToken);
 	res.render('pages/login');
 });
 
@@ -258,8 +253,8 @@ app.post('/login', (req, res) => {
 	// const password = req.body.password;
 	const query = 'select * from users where users.spotifyUsername = $1'; //Not sure about this
 	const values = [spotifyUsername];
-	console.log(req);
-	
+	//console.log(req);
+
 
 	db.one(query, values)
 		.then(data => {
@@ -268,7 +263,7 @@ app.post('/login', (req, res) => {
 			res.redirect('/'); //Redirect home with updated session
 		})
 		.catch(err => {
-			console.log(err);
+			//console.log(err);
 			res.redirect('/login');
 		});
 });
@@ -296,7 +291,7 @@ app.get('/settings', (req, res) => {
 	initialvalue4 = settings.playlist_description;
 	res.render('pages/settings', {initialvalue1, initialvalue2, initialvalue3, initialvalue4});
 	}
-	else{
+	else {
 		res.render('pages/login');
 	}
 })
@@ -312,23 +307,22 @@ app.post('/settings', (req, res) => {
 // Make sure to apply the auth middleware to the /discover route
 app.get('/discover', (req, res) => {
 	axios({
-		url: `https://api.spotify.com/v1/users/${profile.id}/playlists`,
+		url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
 		method: 'GET',
 		headers: {
-			'Authorization': `Bearer ${accessToken}`, // Make sure you have your access token
+			'Authorization': `Bearer ${req.session.accessToken}`, // Make sure you have your access token
 			'Content-Type': 'application/json'
 		}
 	})
 		.then(response => {
 			// console.log(response.data);
-			if(loggedIn)
-			{
+			if (loggedIn) {
 				res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
 			}
-			else{
+			else {
 				res.render('pages/login');
 			}
-			
+
 		})
 		.catch(error => {
 			console.error('Error fetching playlists:', error);
@@ -345,8 +339,8 @@ app.get('/welcome', (req, res) => {
 //in progress
 app.post('/merge', async (req, res) => {
 
-	const user = await fetchProfile(accessToken);
-	const accessString = `Bearer ${accessToken}`;
+	const user = await fetchProfile(req.session.accessToken);
+	const accessString = `Bearer ${req.session.accessToken}`;
 
 	//playlist params, if possible to no be hard coded later on
 	const playlistName = settings.playlist_name; //req.query.name;
@@ -358,12 +352,12 @@ app.post('/merge', async (req, res) => {
 	//basic uri grab
 	const playlistIDs = [];
 	for await (const uri of req.body.selectedPlaylistURIs) {
-		if(uri.substring(0,17) == `spotify:playlist:`){
+		if (uri.substring(0, 17) == `spotify:playlist:`) {
 			playlistIDs.push(uri.slice(17));
 		}
 	}
 
-	const response = 
+	const response =
 		await axios({
 			url: `https://api.spotify.com/v1/users/${user.id}/playlists`,
 			method: `POST`,
@@ -379,17 +373,17 @@ app.post('/merge', async (req, res) => {
 				description: playlistDescription
 				*/
 			},
-			
+
 		})
 
 	const newPlaylist = response.data;
 
 	let trackURIs = [];
-	
+
 	for (const ID of playlistIDs) {
 		let offset = 0;
-		do{
-			const responseA = 
+		do {
+			const responseA =
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${ID}/tracks`,
 					method: `GET`,
@@ -401,12 +395,12 @@ app.post('/merge', async (req, res) => {
 						offset: offset
 					}
 				});
-			if(responseA.data.items.length == 0){
+			if (responseA.data.items.length == 0) {
 				break;
 			}
 			let playlistItemArray = responseA.data.items;
 			for (item of playlistItemArray) {
-				if(item.track === null) {
+				if (item.track === null) {
 					break;
 				}
 				trackURIs.push(item.track.uri);
@@ -414,7 +408,7 @@ app.post('/merge', async (req, res) => {
 			offset = offset + 100;
 		} while (true)
 	}
-	while(trackURIs.length > 0) {
+	while (trackURIs.length > 0) {
 		if (trackURIs.length <= 100) {
 			const responseB =
 				await axios({
@@ -431,7 +425,7 @@ app.post('/merge', async (req, res) => {
 			trackURIs = [];
 		} else {
 			const temp = trackURIs.slice(100);
-			const postURIs = trackURIs.splice(0,100);
+			const postURIs = trackURIs.splice(0, 100);
 			const responseB =
 				await axios({
 					url: `https://api.spotify.com/v1/playlists/${newPlaylist.id}/tracks`,
@@ -455,7 +449,7 @@ app.post('/merge', async (req, res) => {
 });
 
 async function addTrack(trackURI, playlistID, accessStr) {
-	const response = 
+	const response =
 		await axios({
 			url: `https://api.spotify.com/v1/playlists/${playlistID}/tracks`,
 			method: `POST`,
@@ -466,7 +460,7 @@ async function addTrack(trackURI, playlistID, accessStr) {
 			params: {
 				uris: trackURI,
 			},
-		}).catch(error => {});
+		}).catch(error => { });
 
 }
 
@@ -482,10 +476,41 @@ async function getTrackInfo(access_token) {
 //test search with no user context
 app.get('/search', async (req, res) => {
 	const Token = await getToken().then(response => {
+		profile = req.session.profile;
 		getTrackInfo(response.access_token).then(profile => {
-			console.log(profile);
+			console.log(req.session.profile);
 		})
 	});
+});
+
+
+app.get('/playlists', (req, res) => {
+    axios({
+        url: `https://api.spotify.com/v1/users/${profile.id}/playlists`,
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`, // Make sure you have your access token
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            // console.log(response.data);
+            if(loggedIn)
+            {
+                const query = "SELECT uri FROM playlists WHERE playlists.spotifyUsername = $1;"
+                db.any(query, [req.body.spotifyUsername])
+				
+                res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
+            }
+            else{
+                res.render('pages/login');
+            }
+            
+        })
+        .catch(error => {
+            console.error('Error fetching playlists:', error);
+            res.status(500).send('Failed to retrieve playlists');
+        });
 });
 
 // *****************************************************
