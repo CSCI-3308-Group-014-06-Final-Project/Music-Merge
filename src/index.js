@@ -470,7 +470,7 @@ app.post('/merge', async (req, res) => {
 
 
 	const query = `INSERT INTO playlists (playlistID, spotifyUsername) VALUES ($1, $2) returning *;`;
-	const values = [newPlaylist.id];
+	const values = [newPlaylist.id, user.id];
 	db.one(query, values)
 	.then(data => {
 		console.log("Query executed successfully. Response:", data);
@@ -517,7 +517,9 @@ app.get('/search', async (req, res) => {
 });
 
 
-app.get('/playlists', (req, res) => {
+app.get('/playlists', async (req, res) => {
+	const user = await fetchProfile(req.session.accessToken);
+
     axios({
         url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
         method: 'GET',
@@ -528,11 +530,12 @@ app.get('/playlists', (req, res) => {
     })
         .then(response => {
             // console.log(response.data);
+			// if(req.session.loggedIn)
             if(loggedIn)
             {
                 const query = "SELECT playlistID FROM playlists WHERE playlists.spotifyUsername = $1;"
-                console.log("spotify username is:", req.body.spotifyUsername);
-				db.any(query, [req.body.spotifyUsername])
+                console.log("spotify username is:", user.id);
+				db.any(query, [user.id])
 					.then(async data => {
 						console.log("Query executed successfully. Response:", data);
 						// Handle the response here
