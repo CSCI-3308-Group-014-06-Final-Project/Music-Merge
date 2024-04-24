@@ -15,6 +15,7 @@ Our strategy for increasing novelty is to allow the user the choice for how to g
 - (Optional) Dynamic updates merged to reflect changes in either distinct playlist 
 - search for other users 
 -->
+- Settings to modify the next merged playlist
 - Login and Logout sessions
 - View all previously made merged playlists
 - Simple user-profile displaying Spotify profile stats (follows, username, pfp)
