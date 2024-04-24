@@ -195,10 +195,10 @@ async function getToken() {
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 const settings = {
-	playlist_name: "",
-	playlist_public: undefined,
-	playlist_collaborative: undefined,
-	playlist_description: "",
+	playlist_name: "default",
+	playlist_public: false,
+	playlist_collaborative: false,
+	playlist_description: "default",
 };
 
 const user = {
