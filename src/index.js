@@ -623,9 +623,9 @@ app.get('/playlists', async (req, res) => {
                 link: links[index]
             }));
 
-            res.render('pages/playlists', { playlists: playlists});
+            res.render('pages/playlists', { playlists: playlists, LoggedIn: req.session.loggedIn});
         } else {
-            res.render('pages/login');
+            res.render('pages/login', LoggedIn: req.session.loggedIn);
         }
     } catch (error) {
         console.error("Error executing query:", error);
