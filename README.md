@@ -1,5 +1,3 @@
-# **IN PROGRESS**
-
 # Music-Merge
 **“For our music enthusiasts around the world, our vision is to revolutionize the way people curate and enjoy their playlists and have something of their own that expresses both parties. Our goal is to seamlessly merge their playlists, and have a dynamic and personalized music experience.”**
 
@@ -9,15 +7,16 @@ Our strategy for increasing novelty is to allow the user the choice for how to g
 
 # Features
 - Merge two distinct Playlists into one 
-- Get recommendations from two users and combine songs into a playlist
-- Allow user to remove some songs from a merge playlist
 <!-- 
+- Allow user to remove some songs from a merge playlist
+- Get recommendations from two users and combine songs into a playlist
 - Add songs to merged playlists (recommendations?)
 - Possible provide cross-platform playlist transfers
 - (Optional) Dynamic updates merged to reflect changes in either distinct playlist 
 - search for other users 
 -->
 - Login, logout, 
+- View all previously made merged playlists
 - Simple user-profile interface for managing Linked Account(s?) and merge playlist
 
 
@@ -35,13 +34,15 @@ Our strategy for increasing novelty is to allow the user the choice for how to g
 - Spotify API
 - HandleBars
 - Docker
-- (Web Deployment Service)
+- Azure
 - PostgreSQL
 - NodeJS
 
 # How to run Application
 
-First, clone the repository. Then, add a .env file with the following content:
+Firstly, create a Spotify Web API app to obtain a
+
+Add a .env file with the following content:
 ```
 # database credentials
 POSTGRES_USER="postgres"
@@ -49,24 +50,29 @@ POSTGRES_PASSWORD="pwd"
 POSTGRES_DB="users"
 
 # Node vars
-SESSION_SECRET="febdecba354845d2b88944e98fe9dd50"
-API_KEY="603b2cf1577c4343a3e7a378ace0be6c"
-REDIRECT_URI="http://localhost:3000/"
+SESSION_SECRET="your-clientId-secret"
+API_KEY="your-cliendId-key"
+REDIRECT_URI="http://localhost:3000/login"
 ```
 # How to run Tests
 Change the last line of docker-compose.yaml to `npm run testandrun`
 
 # Link to Application
+We have also deployed our application to the azure cloud! However, our web app is currently in developer mode (deployment mode in the spotify web app takes several weeks to be approved for) so testing of the deployed link is by invite only.
+
+```
+http://daal-csci-project.eastus.cloudapp.azure.com:3000/register
+```
 
 # Prerequisites
 - npm
 - docker-compose
+- Spotify Web API app
 
 # Installation Instructions
 1. Download the latest release
 2. Navigate to the home directory of the repository
 2. Install npm dependencies with `npm install`
-3. Open up the terminal and navigate to the `src` folder
-4. Run `docker-compose up -d` in your terminal
-5. Visit `http:\\localhost:3000`
-6. Enjoy!
+3. Run `docker-compose up -d` in your terminal
+4. Visit `http://localhost:3000/register`
+5. Enjoy!
