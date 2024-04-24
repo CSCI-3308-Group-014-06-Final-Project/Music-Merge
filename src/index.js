@@ -471,8 +471,13 @@ app.post('/merge', async (req, res) => {
 
 	const query = `INSERT INTO playlists (playlistID, spotifyUsername) VALUES ($1, $2) returning *;`;
 	const values = [newPlaylist.id, user.id];
-	db.one(query, values);
-	console.log("Query executed successfully. Response:", rows);
+	db.one(query, values)
+	.then(data => {
+		console.log("Query executed successfully. Response:", data);
+	})
+	.catch(err => {
+		console.log("Error inserting into playlists!")
+	});
 	
 });
 
@@ -526,11 +531,13 @@ app.get('/playlists', (req, res) => {
             if(loggedIn)
             {
                 const query = "SELECT playlistID FROM playlists WHERE playlists.spotifyUsername = $1;"
-                db.any(query, [req.body.spotifyUsername])
-					.then(async function (rows) {
+                console.log("spotify username is:", req.body.spotifyUsername);
+				db.any(query, [req.body.spotifyUsername])
+					.then(async data => {
+						console.log("Query executed successfully. Response:", data);
 						// Handle the response here
 						const playlistsFromID = []
-						for(const playlistID in rows)
+						for(const playlistID in data)
 						{
 							const playlist = await axios({
 								url: `https://api.spotify.com/v1/playlists/${playlistID}`,
@@ -538,11 +545,12 @@ app.get('/playlists', (req, res) => {
 								headers: {
 								Authorization: accessString
 								}
-							});
-							playlistsFromID.push(playlist.data);
+							})
+							
+								playlistsFromID.push(playlist);
+							
 						};
 						res.render('pages/discover', { playlists: playlistsFromID, settings: settings.option2 });
-						console.log("Query executed successfully. Response:", rows);
 					})
 					.catch(function (error) {
 						// Handle any errors that occur during the query execution
