@@ -625,7 +625,7 @@ app.get('/playlists', async (req, res) => {
 
             res.render('pages/playlists', { playlists: playlists, LoggedIn: req.session.loggedIn});
         } else {
-            res.render('pages/login', LoggedIn: req.session.loggedIn);
+            res.render('pages/login', {LoggedIn: req.session.loggedIn});
         }
     } catch (error) {
         console.error("Error executing query:", error);
