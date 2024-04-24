@@ -491,10 +491,10 @@ app.get('/search', async (req, res) => {
 
 app.get('/playlists', (req, res) => {
     axios({
-        url: `https://api.spotify.com/v1/users/${profile.id}/playlists`,
+        url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${accessToken}`, // Make sure you have your access token
+            'Authorization': `Bearer ${req.session.accessToken}`, // Make sure you have your access token
             'Content-Type': 'application/json'
         }
     })
@@ -504,8 +504,28 @@ app.get('/playlists', (req, res) => {
             {
                 const query = "SELECT uri FROM playlists WHERE playlists.spotifyUsername = $1;"
                 db.any(query, [req.body.spotifyUsername])
-				
-                res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
+					.then(async function (rows) {
+						// Handle the response here
+						const playlistsFromURI = []
+						for(const playlistURI in data)
+						{
+							const playlist = await axios({
+								url: `https://api.spotify.com/v1/playlists/${playlistURI}`,
+								method: `GET`,
+								headers: {
+								Authorization: accessString
+								}
+							});
+							playlistsFromURI.push(playlistURI.data);
+						};
+						res.render('pages/discover', { playlists: playlistsFromURI, settings: settings.option2 });
+						console.log("Query executed successfully. Response:", rows);
+					})
+					.catch(function (error) {
+						// Handle any errors that occur during the query execution
+						console.error("Error executing query:", error);
+					});
+
             }
             else{
                 res.render('pages/login');
