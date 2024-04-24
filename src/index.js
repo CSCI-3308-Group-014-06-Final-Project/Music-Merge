@@ -194,12 +194,6 @@ async function getToken() {
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
-const settings = {
-	playlist_name: "default",
-	playlist_public: false,
-	playlist_collaborative: false,
-	playlist_description: "default",
-};
 
 const user = {
 	password: undefined,
@@ -247,6 +241,12 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/login', async (req, res) => { //Login attempt
+	req.session.settings = {
+		playlist_name: "default",
+		playlist_public: false,
+		playlist_collaborative: false,
+		playlist_description: "default",
+	};
 	const code = req.query.code; // This captures the code from the URL
 	req.session.accessToken = await getAccessToken(clientId, code);
 	req.session.profile = await fetchProfile(req.session.accessToken);
@@ -290,10 +290,10 @@ app.get('/logout', auth, (req, res) => {
 app.get('/settings', (req, res) => {
     if(loggedIn)
 	{
-	initialvalue1 = settings.playlist_name;
-	initialvalue2 = settings.playlist_public;
-	initialvalue3 = settings.playlist_collaborative
-	initialvalue4 = settings.playlist_description;
+	initialvalue1 = req.session.settings.playlist_name;
+	initialvalue2 = req.session.settings.playlist_public;
+	initialvalue3 = req.session.settings.playlist_collaborative
+	initialvalue4 = req.session.settings.playlist_description;
 	res.render('pages/settings', {initialvalue1, initialvalue2, initialvalue3, initialvalue4});
 	}
 	else {
@@ -302,10 +302,10 @@ app.get('/settings', (req, res) => {
 })
 
 app.post('/settings', (req, res) => {
-	settings.playlist_name = req.body.playlist_name;
-	settings.playlist_public = req.body.playlist_public;
-	settings.playlist_collaborative = req.body.playlist_collaborative;
-	settings.playlist_description = req.body.playlist_description;
+	req.session.settings.playlist_name = req.body.playlist_name;
+	req.session.settings.playlist_public = req.body.playlist_public;
+	req.session.settings.playlist_collaborative = req.body.playlist_collaborative;
+	req.session.settings.playlist_description = req.body.playlist_description;
 
 	res.redirect("/");
 })
@@ -348,10 +348,10 @@ app.post('/merge', async (req, res) => {
 	const accessString = `Bearer ${req.session.accessToken}`;
 
 	//playlist params, if possible to no be hard coded later on
-	const playlistName = settings.playlist_name; //req.query.name;
-	const playlistIsPublic = settings.playlist_public; //req.query.public;
-	const IsCollaborative = settings.playlist_collaborative; //req.query.collaborative;
-	const playlistDescription = settings.playlist_description; //req.query.description;
+	const playlistName = req.session.settings.playlist_name; //req.query.name;
+	const playlistIsPublic = req.session.settings.playlist_public; //req.query.public;
+	const IsCollaborative = req.session.settings.playlist_collaborative; //req.query.collaborative;
+	const playlistDescription = req.session.settings.playlist_description; //req.query.description;
 
 	//handling for two recived playlist URIs
 	//basic uri grab
