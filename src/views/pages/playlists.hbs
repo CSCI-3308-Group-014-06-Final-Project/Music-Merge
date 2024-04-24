@@ -17,15 +17,7 @@
       background-color: #282828; /* Dark table background */
       color: #FFFFFF; /* White text */
     }
-
-    /* Playlist image styling */
-    .playlist-img {
-      width: 100px;
-      height: 60px;
-      object-fit: cover;
-      border: 1px solid #1DB954; /* Spotify green border */
-    }
-
+    
     /* Table row hover effect */
     tr:hover {
       background-color: #404040; /* Darker shade on hover */
@@ -38,36 +30,21 @@
     <table class="table">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Image</th>
-          <th>Owner</th>
-          <th>Tracks Count</th>
+          <th>Playlist Name</th>
+          <th>Link to Playlist</th>
         </tr>
       </thead>
       <tbody>
         {{#each playlists}}
-        <tr>
-          <td>{{this.name}}</td>
-          <td>
-            {{#if this.images}}
-              {{#if this.images.[0]}}
-                <img src="{{this.images.[0].url}}" alt="Playlist Image" class="playlist-img">
-              {{else}}
-                <img src="../../views/images/default.jpg" alt="Default Image" class="playlist-img">
-              {{/if}}
-            {{else}}
-              <img src="../../views/images/default.jpg" alt="Default Image" class="playlist-img">
-            {{/if}}
-          </td>
-          <td>{{this.owner.display_name}}</td>
-          <td>{{this.tracks.total}}</td>
+        <tr> <!-- Start a new row for each playlist -->
+          <td>{{name}}</td> <!-- Display playlist name in the first column -->
+          <td><a href="{{link}}">Link</a></td> <!-- Display link to playlist in the second column -->
         </tr>
         {{/each}}
       </tbody>
     </table>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+

@@ -469,8 +469,8 @@ app.post('/merge', async (req, res) => {
 	}
 
 
-	const query = `INSERT INTO playlists (playlistID, spotifyUsername) VALUES ($1, $2) returning *;`;
-	const values = [newPlaylist.id, user.id];
+	const query = `INSERT INTO playlists (playlistID, spotifyUsername, playlistName) VALUES ($1, $2, $3) returning *;`;
+	const values = [newPlaylist.id, user.id, playlistName];
 	db.one(query, values)
 	.then(data => {
 		console.log("Query executed successfully. Response:", data);
@@ -517,61 +517,128 @@ app.get('/search', async (req, res) => {
 });
 
 
-app.get('/playlists', async (req, res) => {
-	const user = await fetchProfile(req.session.accessToken);
+// app.get('/playlists', async (req, res) => {
+// 	const user = await fetchProfile(req.session.accessToken);
+// 	const accessString = `Bearer ${req.session.accessToken}`;
 
-    axios({
-        url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${req.session.accessToken}`, // Make sure you have your access token
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => {
-            // console.log(response.data);
-			// if(req.session.loggedIn)
-            if(loggedIn)
-            {
-                const query = "SELECT playlistID FROM playlists WHERE playlists.spotifyUsername = $1;"
-                console.log("spotify username is:", user.id);
-				db.any(query, [user.id])
-					.then(async data => {
-						console.log("Query executed successfully. Response:", data);
-						// Handle the response here
-						const playlistsFromID = []
-						for(const playlistID in data)
-						{
-							const playlist = await axios({
-								url: `https://api.spotify.com/v1/playlists/${playlistID}`,
-								method: `GET`,
-								headers: {
-								Authorization: accessString
-								}
-							})
-							
-								playlistsFromID.push(playlist);
-							
-						};
-						res.render('pages/discover', { playlists: playlistsFromID, settings: req.session.settings.option2 });
-					})
-					.catch(function (error) {
-						// Handle any errors that occur during the query execution
-						console.error("Error executing query:", error);
-					});
+//     axios({
+//         url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
+//         method: 'GET',
+//         headers: {
+//             'Authorization': `Bearer ${req.session.accessToken}`, // Make sure you have your access token
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//         .then(response => {
+//             // console.log(response.data);
+// 			// if(req.session.loggedIn)
+//             if(loggedIn)
+//             {
+// 				const names = [];
+// 				const links = [];
+//                 const query = "SELECT playlistID FROM playlists WHERE playlists.spotifyUsername = $1;"
+//                 console.log("spotify username is:", user.id);
+// 				db.any(query, [user.id])
+// 					.then(async data => {
+// 						console.log("Query executed successfully. Response:", data);
+// 						// Handle the response here
+// 						const dataLength = data.length;
+// 						for (let step = 0; step < dataLength; step++) 
+// 						{
+// 							const playlistID = data[step];
+// 							console.log("playlistID is:", playlistID);
+// 							const playlistLink = `https://open.spotify.com/playlist/${playlistID}`;
+// 							links.push(playlistLink);
 
-            }
-            else{
-                res.render('pages/login');
-            }
+// 							// const playlist = await axios({
+// 							// 	url: `https://api.spotify.com/v1/playlists/${playlistID}`,
+// 							// 	method: `GET`,
+// 							// 	dataType: `json`,
+// 							// 	headers: {
+// 							// 	Authorization: accessString 
+// 							// 	}
+// 							//})
+							
+// 								// playlistsFromID.push(playlist);
+// 								// console.log("playlists from ID is:", playlistsFromID);
+// 						};
+// 						//res.render('pages/discover', { playlists: playlistsFromID, settings: req.session.settings.option2 });
+// 					})
+// 					.catch(function (error) {
+// 						// Handle any errors that occur during the query execution
+// 						console.error("Error executing query:", error);
+// 					});
+// 				const query2 = "SELECT playlistName FROM playlists WHERE playlists.spotifyUsername = $1;";
+// 				db.any(query2, [user.id])
+// 					.then(async data => {
+// 						console.log("Query executed successfully. Response:", data);
+// 						const dataLength = data.length;
+// 						for (let step = 0; step < dataLength; step++)
+// 						{
+// 							const playlistName = data[step];
+// 							console.log("playlistID is:", playlistName);
+// 							names.push(playlistName);
+// 						};
+// 					})
+// 					.catch(function (error) {
+// 						// Handle any errors that occur during the query execution
+// 						console.error("Error executing query:", error);
+// 					});
+// 				const playlists = [];
+// 				for (let step = 0; step < names.length; step++)
+// 				{
+// 					const playlist = {name: names[step], link: links[step]};
+// 					playlists.push(playlist);
+// 				}
+//             }
+//             else{
+//                 res.render('pages/login');
+//             }
             
-        })
-        .catch(error => {
-            console.error('Error fetching playlists:', error);
-            res.status(500).send('Failed to retrieve playlists');
-        });
-});
+//         }) 
+//         // .catch(error => {
+//         //     console.error('Error fetching playlists:', error);
+//         //     res.status(500).send('Failed to retrieve playlists');
+//         // });
+// });
 
+app.get('/playlists', async (req, res) => {
+    const user = await fetchProfile(req.session.accessToken);
+    const accessString = `Bearer ${req.session.accessToken}`;
+
+    try {
+        const loggedIn = true; // Assuming loggedIn is set correctly in your code
+
+        if (loggedIn) {
+            const names = [];
+            const links = [];
+            
+            const query = "SELECT playlistID, playlistName FROM playlists WHERE playlists.spotifyUsername = $1;";
+            const dbResponse = await db.any(query, [user.id]);
+
+            for (const row of dbResponse) {
+                const playlistID = row.playlistid;
+                const playlistName = row.playlistname;
+
+                const playlistLink = `https://open.spotify.com/playlist/${playlistID}`;
+                links.push(playlistLink);
+                names.push(playlistName);
+            }
+
+            const playlists = names.map((name, index) => ({
+                name: name,
+                link: links[index]
+            }));
+
+            res.render('pages/playlists', { playlists: playlists});
+        } else {
+            res.render('pages/login');
+        }
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send('Failed to retrieve playlists');
+    }
+});
 
 
 // *****************************************************
