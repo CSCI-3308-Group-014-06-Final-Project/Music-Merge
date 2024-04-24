@@ -1,7 +1,12 @@
 <form action="/settings" method="POST">
-    <label for="option2">Merge Many Playlists:</label>
-    <input type="checkbox" id="option2" name="option2" value="option2"> </br>
-    <label for="option3">Display Your Data:</label>
-    <input type="checkbox" id="option3" name="option3" value="option3" checked> </br>
+    <label for="playlist_name">Playlist Name:</label>
+    <input type="text" name="playlist_name" id="playlist_name" value="{{initialvalue1}}"> </br>
+    <label for="playlst_public">Make the Playlist Public</label>
+    <input type="checkbox" id="playlist_public" name="playlist_public" {{#if initialvalue2}}checked{{/if}}> </br>
+    <label for="option3">Make the Playlist Collaborative</label>
+    <input type="checkbox" id="playlist_collaborative" name="playlist_collaborative" {{#if initialvalue3}}checked{{/if}}> </br>
+    <label for="playlist_description">Playlist Description: </label>
+    <input type="text" name="playlist_description" id="playlist_description" value="{{initialvalue4}}"> </br>
+
     <button type="submit">Save</button>
 </form>

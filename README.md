@@ -51,6 +51,7 @@ POSTGRES_DB="users"
 # Node vars
 SESSION_SECRET="febdecba354845d2b88944e98fe9dd50"
 API_KEY="603b2cf1577c4343a3e7a378ace0be6c"
+REDIRECT_URI="http://localhost:3000/"
 ```
 
 # Link to Application
@@ -63,7 +64,7 @@ API_KEY="603b2cf1577c4343a3e7a378ace0be6c"
 1. Download the latest release
 2. Navigate to the home directory of the repository
 2. Install npm dependencies with `npm install`
-3. Open up the terminal and navigate to the `ProjectSourceCode` folder
+3. Open up the terminal and navigate to the `src` folder
 4. Run `docker-compose up -d` in your terminal
 5. Visit `http:\\localhost:3000`
 6. Enjoy!
