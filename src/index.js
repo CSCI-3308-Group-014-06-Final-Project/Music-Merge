@@ -348,7 +348,7 @@ app.get('/discover', async (req, res) => {
 		offsetN = offsetN + 100;
 	}
 	if (loggedIn) {
-		res.render('pages/discover', { playlists: playlistItems, settings: settings.option2 }); // Assuming you have a view file to display playlists
+		res.render('pages/discover', { playlists: playlistItems, }); // Assuming you have a view file to display playlists
 	}
 	else {
 		res.render('pages/login');
