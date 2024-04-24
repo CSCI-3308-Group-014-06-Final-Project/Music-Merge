@@ -1,38 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <title>User Profile</title>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Welcome, {{user.display_name}}</h1>
-        <p>Followers: {{user.followers.total}}</p>
+    <div class="container d-flex flex-column align-items-center justify-content-center my-5" style="min-height: 100vh;">
+        <h1 class="text-center">Welcome, {{user.display_name}}</h1>
+        <p class="lead text-center">Followers: {{user.followers.total}}</p>
 
-        <h2>Links</h2>
-        <ul>
-            <li><a href="{{user.external_urls.spotify}}">Spotify Profile</a></li>
-        </ul>
+        <div class="my-4 text-center">
+            <h2>Links</h2>
+            <ul class="list-unstyled">
+                <li><a href="{{user.external_urls.spotify}}" class="btn btn-link">Spotify Profile</a></li>
+            </ul>
+        </div>
 
-        <h2>Profile Image</h2>
-        {{#if user.images.length}}
-        {{#each user.images}}
-        <img src="{{this.url}}" alt="Profile Image" style="max-width: 200px;">
-        {{/each}}
-        {{else}}
-        <p>No profile image available.</p>
-        {{/if}}
+        <div class="my-4 text-center">
+            <h2>Profile Image</h2>
+            {{#if user.images.length}}
+                {{#each user.images}}
+                <img src="{{this.url}}" alt="Profile Image" class="img-fluid rounded-circle" style="max-width: 200px; max-height: 200px;">
+                {{/each}}
+            {{else}}
+                <p>No profile image available.</p>
+            {{/if}}
+        </div>
 
-        <form action="/discover" method="get">
-            <button type="submit" class="merge-button">Merge Playlists</button>
-        </form>
-        <form action="/settings" method="get">
-            <button type="submit" class="merge-button">Settings</button>
-        </form>
+        <div class="my-4 text-center">
+            <form action="/discover" method="get" class="d-inline">
+                <button type="submit" class="btn btn-primary">Merge Playlists</button>
+            </form>
+            <form action="/settings" method="get" class="d-inline">
+                <button type="submit" class="btn btn-secondary">Settings</button>
+            </form>
+        </div>
     </div>
-</body>
 
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
 </html>
