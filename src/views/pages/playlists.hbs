@@ -3,17 +3,39 @@
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
+    /* Background and text color changes */
+    body {
+      background-color: #121212; /* Dark background */
+      color: #FFFFFF; /* White text for contrast */
+    }
+
+    h1 {
+      color: #1DB954; /* Spotify green for the title */
+    }
+
+    .table {
+      background-color: #282828; /* Dark table background */
+      color: #FFFFFF; /* White text */
+    }
+
+    /* Playlist image styling */
     .playlist-img {
       width: 100px;
       height: 60px;
       object-fit: cover;
+      border: 1px solid #1DB954; /* Spotify green border */
+    }
+
+    /* Table row hover effect */
+    tr:hover {
+      background-color: #404040; /* Darker shade on hover */
     }
   </style>
 </head>
 <body>
   <div class="container mt-4">
     <h1 class="text-center">Your Merged Playlists</h1>
-    <table class="table table-striped">
+    <table class="table">
       <thead>
         <tr>
           <th>Name</th>
