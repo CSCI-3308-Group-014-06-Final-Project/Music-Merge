@@ -39,7 +39,7 @@ Our strategy for increasing novelty is to allow the user the choice for how to g
 - PostgreSQL
 - NodeJS
 
-# How to run Tests
+# How to run Application
 
 First, clone the repository. Then, add a .env file with the following content:
 ```
@@ -53,6 +53,8 @@ SESSION_SECRET="febdecba354845d2b88944e98fe9dd50"
 API_KEY="603b2cf1577c4343a3e7a378ace0be6c"
 REDIRECT_URI="http://localhost:3000/"
 ```
+# How to run Tests
+Change the last line of docker-compose.yaml to `npm run testandrun`
 
 # Link to Application
 
