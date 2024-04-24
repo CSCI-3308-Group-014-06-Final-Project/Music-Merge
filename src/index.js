@@ -476,6 +476,36 @@ app.get('/search', async (req, res) => {
 	});
 });
 
+
+app.get('/playlists', (req, res) => {
+    axios({
+        url: `https://api.spotify.com/v1/users/${profile.id}/playlists`,
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`, // Make sure you have your access token
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            // console.log(response.data);
+            if(loggedIn)
+            {
+                const query = "SELECT uri FROM playlists WHERE playlists.spotifyUsername = $1;"
+                db.any(query, [req.body.spotifyUsername])
+				
+                res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
+            }
+            else{
+                res.render('pages/login');
+            }
+            
+        })
+        .catch(error => {
+            console.error('Error fetching playlists:', error);
+            res.status(500).send('Failed to retrieve playlists');
+        });
+});
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
