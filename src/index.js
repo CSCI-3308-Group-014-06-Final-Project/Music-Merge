@@ -310,29 +310,50 @@ app.post('/settings', (req, res) => {
 	res.redirect("/");
 })
 // Make sure to apply the auth middleware to the /discover route
-app.get('/discover', (req, res) => {
-	axios({
-		url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
-		method: 'GET',
-		headers: {
-			'Authorization': `Bearer ${req.session.accessToken}`, // Make sure you have your access token
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(response => {
-			// console.log(response.data);
-			if (loggedIn) {
-				res.render('pages/discover', { playlists: response.data.items, settings: settings.option2 }); // Assuming you have a view file to display playlists
-			}
-			else {
-				res.render('pages/login');
-			}
+app.get('/discover', async (req, res) => {
+	let playlistItems = [];
+	let letsLoop = true;
+	let offsetN = 0;
+	while(letsLoop) {
+		//console.log("BANANA ANANA BANANANA BANANANA PI");
+		const response = 
+			await axios({
+				url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${req.session.accessToken}`, // Make sure you have your access token
+					'Content-Type': 'application/json'
+				},
+				params: {
+					offset: offsetN
+				}
+			}).catch(error => {
+				console.error('Error fetching playlists:', error);
+				res.status(500).send('Failed to retrieve playlists');
+		    });
 
-		})
-		.catch(error => {
-			console.error('Error fetching playlists:', error);
-			res.status(500).send('Failed to retrieve playlists');
-		});
+		//let playlistPage = response.data;
+		if(response.data.items.length == 0) {
+			letsLoop = false;
+		} 
+
+		let playlistPage = response.data.items;
+		for (item of playlistPage) {
+			if (item.uri === null) {
+				break;
+			}
+			console.log(item.name);
+			playlistItems.push(item);
+		}
+		offsetN = offsetN + 100;
+	}
+	if (loggedIn) {
+		res.render('pages/discover', { playlists: playlistItems, settings: settings.option2 }); // Assuming you have a view file to display playlists
+	}
+	else {
+		res.render('pages/login');
+	}
+
 });
 
 app.get('/welcome', (req, res) => {
