@@ -340,7 +340,7 @@ app.get('/discover', async (req, res) => {
 			if (item.uri === null) {
 				break;
 			}
-			console.log(item.name);
+			//console.log(item.name);
 			playlistItems.push(item);
 		}
 		offsetN = offsetN + 100;
@@ -505,13 +505,15 @@ app.get('/search', async (req, res) => {
 	const Token = await getToken().then(response => {
 		profile = req.session.profile;
 		getTrackInfo(response.access_token).then(profile => {
-			console.log(req.session.profile);
+			//console.log(req.session.profile);
 		})
 	});
 });
 
 
-app.get('/playlists', (req, res) => {
+app.get('/playlists', async (req, res) => {
+	const user = await fetchProfile(req.session.accessToken);
+
     axios({
         url: `https://api.spotify.com/v1/users/${req.session.profile.id}/playlists`,
         method: 'GET',
@@ -525,8 +527,8 @@ app.get('/playlists', (req, res) => {
             if(req.session.loggedIn)
             {
                 const query = "SELECT playlistID FROM playlists WHERE playlists.spotifyUsername = $1;"
-                console.log("spotify username is:", req.body.spotifyUsername);
-				db.any(query, [req.body.spotifyUsername])
+                console.log("spotify username is:", user.id);
+				db.any(query, [user.id])
 					.then(async data => {
 						console.log("Query executed successfully. Response:", data);
 						// Handle the response here
@@ -544,7 +546,7 @@ app.get('/playlists', (req, res) => {
 								playlistsFromID.push(playlist);
 							
 						};
-						res.render('pages/discover', { playlists: playlistsFromID, settings: settings.option2, LoggedIn: req.session.loggedIn});
+						res.render('pages/discover', { playlists: playlistsFromID, settings: req.session.settings.option2, LoggedIn: req.session.loggedIn});
 					})
 					.catch(function (error) {
 						// Handle any errors that occur during the query execution
@@ -562,6 +564,8 @@ app.get('/playlists', (req, res) => {
             res.status(500).send('Failed to retrieve playlists');
         });
 });
+
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
