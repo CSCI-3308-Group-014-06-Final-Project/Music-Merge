@@ -15,7 +15,7 @@ const bcrypt = require('bcrypt'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 const url = require('url');
 const crypto = require('crypto');
-let loggedIn = false;
+//let loggedIn = false;
 
 const hbs = handlebars.create({
 	extname: 'hbs',
@@ -211,7 +211,7 @@ const auth = (req, res, next) => {
 };
 
 app.get('/', (req, res) => {
-	if(loggedIn){
+	if(req.session.loggedIn){
 		axios({
 			url: `https://api.spotify.com/v1/users/${req.session.profile.id}`,
 			method: 'GET',
@@ -222,7 +222,8 @@ app.get('/', (req, res) => {
 		})
 			.then(response => {
 				res.render('pages/home', {
-					user: response.data // Pass the entire user object to the view
+					user: response.data, // Pass the entire user object to the view
+					LoggedIn: req.session.loggedIn
 				});
 			})
 			.catch(error => {
@@ -237,7 +238,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-	res.render('pages/register');
+	res.render('pages/register', {LoggedIn: req.session.loggedIn});
 });
 
 app.get('/login', async (req, res) => { //Login attempt
@@ -250,7 +251,7 @@ app.get('/login', async (req, res) => { //Login attempt
 	const code = req.query.code; // This captures the code from the URL
 	req.session.accessToken = await getAccessToken(clientId, code);
 	req.session.profile = await fetchProfile(req.session.accessToken);
-	res.render('pages/login');
+	res.render('pages/login', {LoggedIn: req.session.loggedIn});
 });
 
 app.post('/login', (req, res) => {
@@ -264,7 +265,7 @@ app.post('/login', (req, res) => {
 	db.one(query, values)
 		.then(data => {
 			//Update session data with users info (not in db yet)
-			loggedIn = true;
+			req.session.loggedIn = true;
 			res.redirect('/'); //Redirect home with updated session
 		})
 		.catch(err => {
@@ -276,28 +277,22 @@ app.post('/login', (req, res) => {
 //logout page
 app.get('/logout', auth, (req, res) => {
 	// Destroy the session and logout the user
-	req.session.destroy(err => {
-		if (err) {
-			console.error('Error destroying session:', err);
-		}
-		// Render the logout page with a success message
-		loggedIn = false;
-		res.render('pages/logout', { message: 'Logged out Successfully' });
-	});
+	req.session.destroy()//.catch(err => { console.error('Error destroying session:', err); });
+	res.render('pages/logout', { message: 'Logged out Successfully', LoggedIn: false});
 });
 
 //Settings Page
 app.get('/settings', (req, res) => {
-    if(loggedIn)
+    if(req.session.loggedIn)
 	{
 	initialvalue1 = req.session.settings.playlist_name;
 	initialvalue2 = req.session.settings.playlist_public;
 	initialvalue3 = req.session.settings.playlist_collaborative
 	initialvalue4 = req.session.settings.playlist_description;
-	res.render('pages/settings', {initialvalue1, initialvalue2, initialvalue3, initialvalue4});
+	res.render('pages/settings', {initialvalue1, initialvalue2, initialvalue3, initialvalue4, LoggedIn: req.session.loggedIn});
 	}
 	else {
-		res.render('pages/login');
+		res.render('pages/login', {LoggedIn: req.session.loggedIn});
 	}
 })
 
@@ -311,6 +306,9 @@ app.post('/settings', (req, res) => {
 })
 // Make sure to apply the auth middleware to the /discover route
 app.get('/discover', async (req, res) => {
+	if(!req.session.loggedIn) {
+		res.redirect('/login');
+	}
 	let playlistItems = [];
 	let letsLoop = true;
 	let offsetN = 0;
@@ -347,12 +345,8 @@ app.get('/discover', async (req, res) => {
 		}
 		offsetN = offsetN + 100;
 	}
-	if (loggedIn) {
-		res.render('pages/discover', { playlists: playlistItems, }); // Assuming you have a view file to display playlists
-	}
-	else {
-		res.render('pages/login');
-	}
+
+	res.render('pages/discover', { playlists: playlistItems, LoggedIn: req.session.loggedIn}); // Assuming you have a view file to display playlists
 
 });
 
@@ -528,7 +522,7 @@ app.get('/playlists', (req, res) => {
     })
         .then(response => {
             // console.log(response.data);
-            if(loggedIn)
+            if(req.session.loggedIn)
             {
                 const query = "SELECT playlistID FROM playlists WHERE playlists.spotifyUsername = $1;"
                 console.log("spotify username is:", req.body.spotifyUsername);
@@ -550,7 +544,7 @@ app.get('/playlists', (req, res) => {
 								playlistsFromID.push(playlist);
 							
 						};
-						res.render('pages/discover', { playlists: playlistsFromID, settings: settings.option2 });
+						res.render('pages/discover', { playlists: playlistsFromID, settings: settings.option2, LoggedIn: req.session.loggedIn});
 					})
 					.catch(function (error) {
 						// Handle any errors that occur during the query execution
@@ -559,7 +553,7 @@ app.get('/playlists', (req, res) => {
 
             }
             else{
-                res.render('pages/login');
+                res.render('pages/login', {LoggedIn: req.session.loggedIn});
             }
             
         })
