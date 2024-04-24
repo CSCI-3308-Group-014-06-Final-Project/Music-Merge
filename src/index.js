@@ -195,10 +195,10 @@ async function getToken() {
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 const settings = {
-	option1: undefined,
-	option2: undefined,
-	option3: undefined,
-	option4: undefined,
+	playlist_name: "",
+	playlist_public: undefined,
+	playlist_collaborative: undefined,
+	playlist_description: "",
 };
 
 const user = {
@@ -283,8 +283,13 @@ app.get('/logout', auth, (req, res) => {
 
 //Settings Page
 app.get('/settings', (req, res) => {
-	if (loggedIn) {
-		res.render('pages/settings');
+    if(loggedIn)
+	{
+	initialvalue1 = settings.playlist_name;
+	initialvalue2 = settings.playlist_public;
+	initialvalue3 = settings.playlist_collaborative
+	initialvalue4 = settings.playlist_description;
+	res.render('pages/settings', {initialvalue1, initialvalue2, initialvalue3, initialvalue4});
 	}
 	else {
 		res.render('pages/login');
@@ -292,10 +297,12 @@ app.get('/settings', (req, res) => {
 })
 
 app.post('/settings', (req, res) => {
-	settings.option1 = req.body.option1;
-	settings.option2 = req.body.option2;
-	settings.option3 = req.body.option3;
-	settings.option4 = req.body.option4;
+	settings.playlist_name = req.body.playlist_name;
+	settings.playlist_public = req.body.playlist_public;
+	settings.playlist_collaborative = req.body.playlist_collaborative;
+	settings.playlist_description = req.body.playlist_description;
+
+	res.redirect("/");
 })
 // Make sure to apply the auth middleware to the /discover route
 app.get('/discover', (req, res) => {
@@ -336,10 +343,10 @@ app.post('/merge', async (req, res) => {
 	const accessString = `Bearer ${req.session.accessToken}`;
 
 	//playlist params, if possible to no be hard coded later on
-	const playlistName = "The Playlist!" //req.query.name;
-	const playlistIsPublic = false; //req.query.public;
-	const IsCollaborative = false; //req.query.collaborative;
-	const playlistDescription = "Your Newly Merged Playlist!" //req.query.description;
+	const playlistName = settings.playlist_name; //req.query.name;
+	const playlistIsPublic = settings.playlist_public; //req.query.public;
+	const IsCollaborative = settings.playlist_collaborative; //req.query.collaborative;
+	const playlistDescription = settings.playlist_description; //req.query.description;
 
 	//handling for two recived playlist URIs
 	//basic uri grab
