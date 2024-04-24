@@ -3,14 +3,54 @@
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
+    /* Background and text color changes */
+    body {
+      background-color: #121212; /* Dark background */
+      color: #FFFFFF; /* White text for contrast */
+    }
+
+    h1 {
+      color: #1DB954; /* Spotify green for the title */
+    }
+
+    .table {
+      background-color: #282828; /* Dark table background */
+      color: #FFFFFF; /* White text */
+    }
+
+    /* Playlist image styling */
     .playlist-img {
       width: 100px;
       height: 60px;
       object-fit: cover;
+      border: 1px solid #1DB954; /* Spotify green border */
     }
+
+    /* Submit button styling */
+    .btn-primary {
+      background-color: #1DB954; /* Spotify green button */
+      border: none;
+    }
+
+    /* Submit button container styling */
     .submit-btn-container {
       text-align: center;
       margin-top: 20px;
+    }
+
+    /* Checkbox styling */
+    .playlist-checkbox {
+      accent-color: #1DB954; /* Spotify green for checkbox */
+    }
+
+    /* Message styling */
+    #mergeMessage {
+      color: #1DB954; /* Spotify green for success message */
+    }
+
+    /* Table row hover effect */
+    tr:hover {
+      background-color: #404040; /* Darker shade on hover */
     }
   </style>
 </head>
@@ -55,7 +95,7 @@
       <div class="submit-btn-container">
         <button type="submit" class="btn btn-primary">Merge Playlists</button>
       </div>
-      <div id="mergeMessage" class="text-center text-success mt-3"></div>
+      <div id="mergeMessage" class="text-center mt-3"></div>
     </form>
   </div>
 
