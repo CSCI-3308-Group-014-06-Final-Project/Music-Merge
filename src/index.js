@@ -217,23 +217,28 @@ const auth = (req, res, next) => {
 };
 
 app.get('/', (req, res) => {
-	axios({
-		url: `https://api.spotify.com/v1/users/${req.session.profile.id}`,
-		method: 'GET',
-		headers: {
-			'Authorization': `Bearer ${req.session.accessToken}`, // Your Spotify Access Token
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(response => {
-			res.render('pages/home', {
-				user: response.data // Pass the entire user object to the view
-			});
+	if(loggedIn){
+		axios({
+			url: `https://api.spotify.com/v1/users/${req.session.profile.id}`,
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${req.session.accessToken}`, // Your Spotify Access Token
+				'Content-Type': 'application/json'
+			}
 		})
-		.catch(error => {
-			console.error('Error fetching user data:', error);
-			res.status(500).send('Failed to retrieve user data');
-		});
+			.then(response => {
+				res.render('pages/home', {
+					user: response.data // Pass the entire user object to the view
+				});
+			})
+			.catch(error => {
+				console.error('Error fetching user data:', error);
+				res.status(500).send('Failed to retrieve user data');
+			});
+	}
+	else {
+		res.redirect("/login");
+	}
 
 });
 
