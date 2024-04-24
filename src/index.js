@@ -342,13 +342,13 @@ app.get('/discover', async (req, res) => {
 			if (item.uri === null) {
 				break;
 			}
-			console.log(item.name);
+			//console.log(item.name);
 			playlistItems.push(item);
 		}
 		offsetN = offsetN + 100;
 	}
 	if (loggedIn) {
-		res.render('pages/discover', { playlists: playlistItems, }); // Assuming you have a view file to display playlists
+		res.render('pages/discover', { playlists: playlistItems, settings: req.session.settings.option2 }); // Assuming you have a view file to display playlists
 	}
 	else {
 		res.render('pages/login');
@@ -470,7 +470,7 @@ app.post('/merge', async (req, res) => {
 
 
 	const query = `INSERT INTO playlists (playlistID, spotifyUsername) VALUES ($1, $2) returning *;`;
-	const values = [newPlaylist.id, user.id];
+	const values = [newPlaylist.id];
 	db.one(query, values)
 	.then(data => {
 		console.log("Query executed successfully. Response:", data);
@@ -511,7 +511,7 @@ app.get('/search', async (req, res) => {
 	const Token = await getToken().then(response => {
 		profile = req.session.profile;
 		getTrackInfo(response.access_token).then(profile => {
-			console.log(req.session.profile);
+			//console.log(req.session.profile);
 		})
 	});
 });
@@ -550,7 +550,7 @@ app.get('/playlists', (req, res) => {
 								playlistsFromID.push(playlist);
 							
 						};
-						res.render('pages/discover', { playlists: playlistsFromID, settings: settings.option2 });
+						res.render('pages/discover', { playlists: playlistsFromID, settings: req.session.settings.option2 });
 					})
 					.catch(function (error) {
 						// Handle any errors that occur during the query execution
@@ -568,6 +568,8 @@ app.get('/playlists', (req, res) => {
             res.status(500).send('Failed to retrieve playlists');
         });
 });
+
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
