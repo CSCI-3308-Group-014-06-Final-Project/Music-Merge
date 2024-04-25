@@ -42,7 +42,7 @@ Our strategy for increasing novelty is to allow the user the choice for how to g
 
 # How to run Application
 
-Firstly, create a Spotify Web API app to obtain a
+Firstly, create a Spotify Web API app to obtain a client_id and secret
 
 Add a .env file with the following content:
 ```
